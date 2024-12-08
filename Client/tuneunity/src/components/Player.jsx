@@ -40,8 +40,8 @@ const Player = () => {
       <div className="w-screen h-auto flex justify-center items-center p-10">
         <input
           type="text"
-          className="w-[80%] h-20 bg-slate-300 rounded-md p-3"
-          placeholder="Search for YouTube videos..."
+          className="w-[400px] bg-slate-300 rounded-md p-3"
+          placeholder="Song name/ Keys of song"
           onChange={(e) => setSearchQuery(e.target.value)}
         />
         <button

@@ -3,8 +3,7 @@ import Player from '../components/Player'
 import { useState } from 'react'
 import {Link} from 'react-router-dom'
 const Home = () => {
-    const [Join,setJoin]=useState(false);
-    const [Create,SetCreate]=useState(false);
+    const [Join,setJoin]=useState(true);
     const Handle=()=>{
         if(Join)
         {
