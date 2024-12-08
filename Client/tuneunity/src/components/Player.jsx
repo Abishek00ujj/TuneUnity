@@ -5,14 +5,22 @@ const Player = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [videos, setVideos] = useState([]);
   const [error, setError] = useState(null);
-
+  const [Loading,SetLoading]=useState(false);
+  let lastSearch="";
   const handleSearch = async (e) => {
+    SetLoading(true);
     e.preventDefault();
-    if (searchQuery.trim() === "") return;
-
+    if (searchQuery.trim() === "")    
+      {
+        return;
+      }
+      if(searchQuery.trim()==lastSearch)
+        {
+          return;
+        }
+        lastSearch=searchQuery.trim();
     try {
       setError(null);
-
       const response = await axios.get(
         `https://www.googleapis.com/youtube/v3/search`,
         {
@@ -25,13 +33,15 @@ const Player = () => {
           },
         }
       );
-
       setVideos(response.data.items);
     } catch (err) {
       setError(
         err.response?.data?.error?.message || "An error occurred while fetching videos."
       );
       console.error("Error fetching data from YouTube API:", err);
+    }
+    finally{
+      SetLoading(false);
     }
   };
 
@@ -46,12 +56,23 @@ const Player = () => {
         />
         <button
           onClick={handleSearch}
-          className="w-[100px] h-10 pl-5 pr-5 pt-3 pb-3 flex justify-center items-center bg-red-500 text-white rounded-md m-10"
+          className="w-[100px] h-10 pl-5 pr-5 pt-3 pb-3 flex justify-center items-center bg-green-400 text-white rounded-md m-10"
         >
           Search
         </button>
       </div>
-      {error && (
+      {
+          Loading?(
+            <>
+      <div className='w-screen h-screen bg-black justify-center items-center flex'>
+          <div className='w-[80px] h-[80px] bg-green-400 rounded-full animate-spin'>
+              <div className='w-[100px] h-[100px] bg-black rounded-full animate-spin'></div>
+          </div>
+      </div>
+            </>
+          ):(
+            <>
+               {error && (
         <div className="text-center text-red-500">
           <p>{error}</p>
         </div>
@@ -72,6 +93,10 @@ const Player = () => {
           </div>
         ))}
       </div>
+            </>
+          )
+      }
+      
     </div>
   );
 };
