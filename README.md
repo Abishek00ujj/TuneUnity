@@ -1,5 +1,5 @@
 
-# SyncTogether 🎶  
+# TuneUnity 🎶  
 **SyncTogether** is a web app that allows users to listen to and watch YouTube videos together in real-time. Built using the MERN stack, the app ensures synchronized playback, creating a collaborative and fun experience for users.
 
 ---
