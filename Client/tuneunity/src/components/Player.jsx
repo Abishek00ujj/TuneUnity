@@ -46,7 +46,7 @@ const Player = () => {
         />
         <button
           onClick={handleSearch}
-          className="w-[100px] h-10 bg-red-500 text-white rounded-md m-10"
+          className="w-[100px] h-10 pl-5 pr-5 pt-3 pb-3 flex justify-center items-center bg-red-500 text-white rounded-md m-10"
         >
           Search
         </button>
