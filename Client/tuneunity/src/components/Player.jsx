@@ -29,7 +29,7 @@ const Player = () => {
             maxResults: 1,
             q: searchQuery,
             type: "video",
-            key:"AIzaSyAznuDpQN0bJz86nGA1XBLxr2Jhe8QebT8",
+            key:"AIzaSyDf9v3RkpGo0PvUCW1b5U88y61grCrw9iE",
           },
         }
       );
