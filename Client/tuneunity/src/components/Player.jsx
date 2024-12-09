@@ -18,6 +18,7 @@ const Player = () => {
         {
           return;
         }
+        
         lastSearch=searchQuery.trim();
     try {
       setError(null);
