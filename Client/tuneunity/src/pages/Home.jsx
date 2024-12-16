@@ -1,17 +1,28 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Navbar from '../components/Navbar';
 import tuneunitybg from '../assets/tuneunitybg.jpg';
 import {X} from 'lucide-react'
+import loading_groic from '../assets/loading_groic.gif'
 const Home = () => {
   const [downbar1, setDownbar1] = useState(false);
-
-
+  const [Loading,SetLoading]=useState(true);
   const handleDownBar1=()=>{
     setDownbar1(!downbar1);
   }
+  useEffect(()=>{
+      setTimeout(()=>{SetLoading(false)},3000);
+  },[]);
   return(
      <>
-     <Navbar/>
+     {
+        Loading?(
+          <div className='w-screen h-screen bg-black flex justify-center items-center'>
+                 <img src={loading_groic} alt="" />
+          </div>
+        ):
+        (
+            <>
+                <Navbar/>
      <div className='w-screen h-screen bg-black flex flex-col'>
          <div className='w-screen flex space-x-5 justify-center h-28'>
             <div className='font-semibold bg-white text-black w-[45%] h-10 rounded-sm flex justify-center items-center'>New Room</div>
@@ -47,7 +58,9 @@ const Home = () => {
         </div>
           )
      }
-      
+            </>
+        )
+     }  
      </>
   )
 };
