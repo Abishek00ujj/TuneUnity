@@ -1,62 +1,55 @@
-import React from 'react'
-import Player from '../components/Player'
-import { useState } from 'react'
-import {Link} from 'react-router-dom'
+import React, { useState } from 'react'
+import Navbar from '../components/Navbar';
+import tuneunitybg from '../assets/tuneunitybg.jpg';
+import {X} from 'lucide-react'
 const Home = () => {
-    const [Join,setJoin]=useState(true);
-    const Handle=()=>{
-        if(Join)
-        {
-            setJoin(false);
-        }
-        else{
-            setJoin(true);
-        }
-        if(Create)
-        {
-            SetCreate(false);
-        }
-        else
-        {
-            SetCreate
-        }
-    }
-  return (
-    <div className='w-screen h-screen bg-black flex justify-center items-center'>
-        {
-            Join?(
-              <>
-              <div className='w-[500px] h-[300px] text-white rounded-lg backdrop-blur-3xl'>
-             <div className='w-full h-[30%]  flex justify-center items-center'>
-                  <p className='text-white font-bold text-3xl'>Welcome to TuneUnity!🎵🎧</p>
-             </div>
-             <div className='w-full h-[50%] flex justify-center items-center gap-5'>
-             <button className='bg-green-400 text-black pl-5 pr-5 pt-3 pb-3' onClick={Handle}>Join room</button>
-                <button className='bg-green-400 text-black pl-5 pr-5 pt-3 pb-3' onClick={Handle}>Create room</button>
-             </div>
+  const [downbar1, setDownbar1] = useState(false);
+
+
+  const handleDownBar1=()=>{
+    setDownbar1(!downbar1);
+  }
+  return(
+     <>
+     <Navbar/>
+     <div className='w-screen h-screen bg-black flex flex-col'>
+         <div className='w-screen flex space-x-5 justify-center h-28'>
+            <div className='font-semibold bg-white text-black w-[45%] h-10 rounded-sm flex justify-center items-center'>New Room</div>
+            <div className='font-semibold text-white border border-white w-[45%] h-10 rounded-sm flex justify-center items-center' onClick={handleDownBar1}>Join with code</div>
+         </div>
+         <div className='w-screen h-[500%] flex flex-col space-y-5 justify-center items-center'>
+           <img className='w-[300px] h-[300px]' src={tuneunitybg} alt=""  />
+           <p className='font-bold text-2xl text-white'> Get a Link That you can Share</p>
+           <p className='font-extralight text-white'>Tap New Room..</p>
+         </div>
+     </div>
+     {
+          downbar1&&(
+            <div className='w-screen h-[50%] bg-[#121212] fixed bottom-0 rounded-xl'>
+            <div className='w-full h-16 flex  justify-between items-center'>
+               <div className='ml-5'>
+                  <p className='text-white font-semibold text-2xl'>Join with code</p>
+               </div>
+               <div className='mr-5 ' onClick={handleDownBar1}>
+                    <X color='white'/>
+               </div>
+            </div>
+            <div className='w-screen flex justify-center space-y-5'>
+              <div className='w-[70%] justify-center items-center flex'>
+                <input type="text" className='w-[90%] p-3' placeholder='Enter Code' />
+              </div>
+              <div className='text-white justify-center items-center flex h-20'>
+               <div className='w-full h-full flex justify-center items-center'>
+               <p className='text-[20px]'> Join</p>
+              </div> 
+              </div>
+            </div>
         </div>
-              </>
-            ):(
-                <>
-              <div className='w-[500px] h-[300px] text-white rounded-lg backdrop-blur-3xl'>
-             <div className='w-full h-[30%]  flex justify-center items-center'>
-                  <p className='text-white font-bold text-3xl'>Welcome to TuneUnity!🎵🎧</p>
-             </div>
-             <div className='w-full h-[50%] flex flex-col justify-center items-center gap-5'>
-                 <input type="text" name="" id="" className='w-[300px] h-16 text-black p-5' placeholder='Room code'  />
-             </div>
-             <div className='w-full flex justify-center'>
-             <Link to='/player'> <button className='bg-green-400 font-bold text-black pl-5 pr-5 pt-3 pb-3'>Sync now!</button></Link>
-             </div>
-             <div className='w-full flex justify-end'>
-                    <p className='text-white' onClick={Handle}>Create a new room?</p>
-                 </div>
-        </div>
-              </>
-            )
-      }
-    </div>
+          )
+     }
+      
+     </>
   )
-}
+};
 
 export default Home
