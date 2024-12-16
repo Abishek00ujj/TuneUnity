@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import axios from "axios";
-
+import toast, { Toaster } from 'react-hot-toast';
+import loading_groic from '../assets/loading_groic.gif'
 const Player = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [videos, setVideos] = useState([]);
   const [error, setError] = useState(null);
   const [Loading,SetLoading]=useState(false);
+
+  const [dummyLoading,SetdummyLoading]=useState(true);
   let lastSearch="";
   const handleSearch = async (e) => {
     SetLoading(true);
@@ -18,7 +21,6 @@ const Player = () => {
         {
           return;
         }
-        
         lastSearch=searchQuery.trim();
     try {
       setError(null);
@@ -45,9 +47,26 @@ const Player = () => {
       SetLoading(false);
     }
   };
-
+  useEffect(() => {
+    toast.success("Public room created");
+    setTimeout(() => {
+      toast.success("Abishek joined the room", { duration: 3000 , icon:'😉'});
+      SetdummyLoading(false);
+    }, 3000);
+  }, []);
   return (
-    <div className="w-screen h-screen flex flex-col gap-5 bg-black">
+    <>
+     <Toaster />
+    {
+    dummyLoading ?(
+      <>
+       <div className='w-screen h-screen bg-black flex justify-center items-center'>
+            <img src={loading_groic} alt="" />
+       </div>
+      </>
+    ):(
+       <>
+         <div className="w-screen h-screen flex flex-col gap-5 bg-black">
       <div className="w-screen h-auto flex justify-center items-center p-10">
         <input
           type="text"
@@ -98,6 +117,11 @@ const Player = () => {
           )
       };
     </div>
+       </>
+    )
+    }
+    
+    </>
   );
 };
 

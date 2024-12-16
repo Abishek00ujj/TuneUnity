@@ -1,24 +1,31 @@
 import React, { useEffect, useState } from 'react'
 import Navbar from '../components/Navbar';
+import {Link} from 'react-router-dom'
 import tuneunitybg from '../assets/tuneunitybg.jpg';
 import {X} from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast';
 import loading_groic from '../assets/loading_groic.gif'
 const Home = () => {
   const [downbar1, setDownbar1] = useState(false);
-  const notify = (message) => toast(message);
+  const notify = (message) => toast(message,{
+    position:'top-center',
+    icon:"😊"
+  });
   const [Loading,SetLoading]=useState(true);
   const handleDownBar1=()=>{
     setDownbar1(!downbar1);
   }
-  useEffect(()=>{
-      setTimeout(()=>{
-        toast("You're using the beta version of TuneUnity🎉❤️.Please report any issues you face on support.tuneunity@gmail.com");
-        toast("Hear songs together❤️");
-        SetLoading(false)
-      },3000);
-      
-  },[]);
+  useEffect(() => {
+    setTimeout(() => {
+      toast("You're using the beta version of TuneUnity🎉❤️. Report issues at support.tuneunity@gmail.com",{
+        position:'top-center',
+        icon:"😊",
+        duration: 3000 
+      });
+      toast("Hear songs together🫂", { duration: 3000 , icon:"❤️"});
+      SetLoading(false);
+    }, 3000);
+  }, []);
   return(
      <>
      <Toaster />
@@ -33,7 +40,7 @@ const Home = () => {
                 <Navbar/>
      <div className='w-screen h-screen bg-black flex flex-col'>
          <div className='w-screen flex space-x-5 justify-center h-28'>
-            <div className='font-semibold bg-white text-black w-[45%] h-14 rounded-sm flex justify-center items-center'>New Room</div>
+            <Link to='player' className='font-semibold bg-white text-black w-[45%] h-14 rounded-sm flex justify-center items-center'><div >New Room</div></Link>
             <div className='font-semibold text-white border border-white w-[45%] h-14 rounded-sm flex justify-center items-center' onClick={handleDownBar1}>Join with code</div>
          </div>
          <div className='w-screen h-[500%] flex flex-col space-y-5 justify-center items-center'>
