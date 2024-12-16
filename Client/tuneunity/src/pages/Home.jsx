@@ -33,13 +33,16 @@ const Home = () => {
                 <Navbar/>
      <div className='w-screen h-screen bg-black flex flex-col'>
          <div className='w-screen flex space-x-5 justify-center h-28'>
-            <div className='font-semibold bg-white text-black w-[45%] h-10 rounded-sm flex justify-center items-center'>New Room</div>
-            <div className='font-semibold text-white border border-white w-[45%] h-10 rounded-sm flex justify-center items-center' onClick={handleDownBar1}>Join with code</div>
+            <div className='font-semibold bg-white text-black w-[45%] h-14 rounded-sm flex justify-center items-center'>New Room</div>
+            <div className='font-semibold text-white border border-white w-[45%] h-14 rounded-sm flex justify-center items-center' onClick={handleDownBar1}>Join with code</div>
          </div>
          <div className='w-screen h-[500%] flex flex-col space-y-5 justify-center items-center'>
            <img className='w-[300px] h-[300px]' src={tuneunitybg} alt=""  />
            <p className='font-bold text-2xl text-white'> Get a Link That you can Share</p>
-           <p className='font-extralight text-white'>Tap New Room..</p>
+           <div className='w-full flex justify-center flex-col items-center'>
+           <p className='font-extralight text-white'>Tap New Room to get a link that </p>
+           <p className='font-extralight text-white'>you can share with people you want to listen songs with.</p>
+           </div>
          </div>
      </div>
      {
