@@ -1,27 +1,29 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { SkipBack, SkipForward, Play, Pause } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
-import loading_groic from '../assets/loading_groic.gif'
+import loading_groic from '../assets/loading_groic.gif';
+import PlayerNavbar from './PlayerNavbar';
+
 const Player = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [videos, setVideos] = useState([]);
   const [error, setError] = useState(null);
-  const [Loading,SetLoading]=useState(false);
+  const [Loading, SetLoading] = useState(false);
+  const [dummyLoading, SetdummyLoading] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
 
-  const [dummyLoading,SetdummyLoading]=useState(true);
-  let lastSearch="";
-  const handleSearch = async (e) => {
+  const videoRef = React.useRef(null);
+  let lastSearch = "";
+  const handleSearch = async () => {
     SetLoading(true);
-    e.preventDefault();
-    if (searchQuery.trim() === "")    
-      {
-        return;
-      }
-      if(searchQuery.trim()==lastSearch)
-        {
-          return;
-        }
-        lastSearch=searchQuery.trim();
+    // e.preventDefault();
+    if (searchQuery.trim() === "" || searchQuery.trim() === lastSearch) {
+      return;
+    }
+    lastSearch = searchQuery.trim();
     try {
       setError(null);
       const response = await axios.get(
@@ -32,95 +34,136 @@ const Player = () => {
             maxResults: 1,
             q: searchQuery,
             type: "video",
-            key:"AIzaSyDf9v3RkpGo0PvUCW1b5U88y61grCrw9iE",
+            key: "AIzaSyDf9v3RkpGo0PvUCW1b5U88y61grCrw9iE",
           },
         }
       );
       setVideos(response.data.items);
     } catch (err) {
-      setError(
-        err.response?.data?.error?.message || "An error occurred while fetching videos."
-      );
+      setError(err.response?.data?.error?.message || "An error occurred while fetching videos.");
       console.error("Error fetching data from YouTube API:", err);
-    }
-    finally{
+    } finally {
       SetLoading(false);
     }
   };
+
+  const handlePlayPause = () => {
+    if (isPlaying) {
+      videoRef.current.pause();
+    } else {
+      videoRef.current.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const handleVideoTimeUpdate = () => {
+    if (videoRef.current) {
+      setCurrentTime(videoRef.current.currentTime);
+    }
+  };
+
+  const handleLoadedMetadata = () => {
+    if (videoRef.current) {
+      setDuration(videoRef.current.duration);
+    }
+  };
+
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
+  };
+
   useEffect(() => {
     toast.success("Public room created");
+    setSearchQuery("omiya");
+    handleSearch();
     setTimeout(() => {
-      toast.success("Abishek joined the room", { duration: 3000 , icon:'😉'});
+      toast.success("Abishek joined the room", { duration: 3000, icon: '😉' });
       SetdummyLoading(false);
     }, 3000);
   }, []);
+
   return (
     <>
-     <Toaster />
-    {
-    dummyLoading ?(
-      <>
-       <div className='w-screen h-screen bg-black flex justify-center items-center'>
-            <img src={loading_groic} alt="" />
-       </div>
-      </>
-    ):(
-       <>
-         <div className="w-screen h-screen flex flex-col gap-5 bg-black">
-      <div className="w-screen h-auto flex justify-center items-center p-10">
-        <input
-          type="text"
-          className="w-[400px] bg-slate-300 rounded-md p-3"
-          placeholder="Song name/ Keys of song"
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        <button
-          onClick={handleSearch}
-          className="w-[100px] h-10 pl-5 pr-5 pt-3 pb-3 flex justify-center items-center bg-green-400 text-white rounded-md m-10"
-        >
-          Search
-        </button>
-      </div>
-      {
-          Loading?(
-            <>
-      <div className='w-screen h-screen bg-black justify-center items-center flex'>
-          <div className='w-[80px] h-[80px] bg-green-400 rounded-full animate-spin'>
-              <div className='w-[100px] h-[100px] bg-black rounded-full animate-spin'></div>
-          </div>
-      </div>
-            </>
-          ):(
-            <>
-               {error && (
-        <div className="text-center text-red-500">
-          <p>{error}</p>
+      <Toaster />
+      {dummyLoading ? (
+        <div className="w-screen h-screen bg-black flex justify-center items-center">
+          <img src={loading_groic} alt="Loading" />
         </div>
-      )}
-      <div className="flex flex-wrap justify-center items-center gap-5">
-        {videos.map((video) => (
-          <div
-            key={video.id.videoId}
-            className="w-full max-w-4xl aspect-video rounded-lg shadow-lg overflow-hidden"
-          >
-            <iframe
-              src={`https://www.youtube.com/embed/${video.id.videoId}?rel=0&enablejsapi=1&controls=1&autoplay=1`}
-              title={video.snippet.title}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="w-full h-full"
-            />
+      ) : (
+        <>
+          <PlayerNavbar />
+          <div className="w-screen h-screen flex flex-col gap-5 bg-black">
+            {Loading ? (
+              <div className="w-screen h-screen bg-black flex justify-center items-center">
+                <div className="w-[80px] h-[80px] bg-green-400 rounded-full animate-spin">
+                  <div className="w-[100px] h-[100px] bg-black rounded-full animate-spin"></div>
+                </div>
+              </div>
+            ) : (
+              <>
+                {error && (
+                  <div className="text-center text-red-500">
+                    <p>{error}</p>
+                  </div>
+                )}
+                <div className="flex flex-wrap justify-center items-center gap-5">
+                  {videos.map((video) => (
+                    <div
+                      key={video.id.videoId}
+                      className="w-full max-w-4xl rounded-lg shadow-lg overflow-hidden bg-black"
+                    >
+                      <div className="w-full h-full flex flex-col items-center p-4">
+                        <iframe
+                          ref={videoRef}
+                          src={`https://www.youtube.com/embed/${video.id.videoId}?rel=0&enablejsapi=1&controls=0`}
+                          title={video.snippet.title}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          className="w-full h-64 sm:h-80"
+                          onTimeUpdate={handleVideoTimeUpdate}
+                          onLoadedMetadata={handleLoadedMetadata}
+                        />
+                        <div className="text-white mt-2">{video.snippet.title.substring(0, 50)}</div>
+                        <div className="text-slate-400">{video.snippet.channelTitle}</div>
+                        <div className="w-full mt-2">
+                          <input
+                            type="range"
+                            min="0"
+                            max={duration}
+                            value={currentTime}
+                            onChange={(e) => (videoRef.current.currentTime = e.target.value)}
+                            className="w-full"
+                          />
+                          <div className="flex justify-between text-white text-sm">
+                            <span>{formatTime(currentTime)}</span>
+                            <span>{formatTime(duration)}</span>
+                          </div>
+                        </div>
+                        <div className="w-full flex justify-around mt-4">
+                          <button>
+                            <SkipBack size={50} color="white" />
+                          </button>
+                          <button
+                            className="bg-white rounded-full p-3"
+                            onClick={handlePlayPause}
+                          >
+                            {isPlaying ? <Pause size={50} color="black" /> : <Play size={50} color="black" />}
+                          </button>
+                          <button>
+                            <SkipForward size={50} color="white" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
-        ))}
-      </div>
-            </>
-          )
-      };
-    </div>
-       </>
-    )
-    }
-    
+        </>
+      )}
     </>
   );
 };
