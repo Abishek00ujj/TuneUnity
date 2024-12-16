@@ -2,18 +2,26 @@ import React, { useEffect, useState } from 'react'
 import Navbar from '../components/Navbar';
 import tuneunitybg from '../assets/tuneunitybg.jpg';
 import {X} from 'lucide-react'
+import toast, { Toaster } from 'react-hot-toast';
 import loading_groic from '../assets/loading_groic.gif'
 const Home = () => {
   const [downbar1, setDownbar1] = useState(false);
+  const notify = (message) => toast(message);
   const [Loading,SetLoading]=useState(true);
   const handleDownBar1=()=>{
     setDownbar1(!downbar1);
   }
   useEffect(()=>{
-      setTimeout(()=>{SetLoading(false)},3000);
+      setTimeout(()=>{
+        toast("You're using the beta version of TuneUnity🎉❤️.Please report any issues you face on support.tuneunity@gmail.com");
+        toast("Hear songs together❤️");
+        SetLoading(false)
+      },3000);
+      
   },[]);
   return(
      <>
+     <Toaster />
      {
         Loading?(
           <div className='w-screen h-screen bg-black flex justify-center items-center'>
