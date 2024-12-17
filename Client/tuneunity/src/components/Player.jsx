@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { SkipBack, SkipForward, Play, Pause } from 'lucide-react';
-import toast, { Toaster } from 'react-hot-toast';
-import loading_groic from '../assets/loading_groic.gif';
-import PlayerNavbar from './PlayerNavbar';
+import { SkipBack, SkipForward, Play, Pause } from "lucide-react";
+import toast, { Toaster } from "react-hot-toast";
+import loading_groic from "../assets/loading_groic.gif";
+import PlayerNavbar from "./PlayerNavbar";
 
 const Player = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -17,10 +17,12 @@ const Player = () => {
 
   const videoRef = React.useRef(null);
   let lastSearch = "";
-  const handleSearch = async () => {
+
+  const handleSearch = async (e) => {
+    if (e) e.preventDefault();
     SetLoading(true);
-    // e.preventDefault();
     if (searchQuery.trim() === "" || searchQuery.trim() === lastSearch) {
+      SetLoading(false);
       return;
     }
     lastSearch = searchQuery.trim();
@@ -76,11 +78,9 @@ const Player = () => {
 
   useEffect(() => {
     toast.success("Public room created");
-    setSearchQuery("omiya");
-    handleSearch();
     SetLoading(false);
     setTimeout(() => {
-      toast.success("Abishek joined the room", { duration: 3000, icon: '😉' });
+      toast.success("Abishek joined the room", { duration: 3000, icon: "😉" });
       SetdummyLoading(false);
     }, 3000);
   }, []);
@@ -95,7 +95,25 @@ const Player = () => {
       ) : (
         <>
           <PlayerNavbar />
-          <div className="w-screen h-screen flex flex-col gap-5 bg-black">
+          <div className="w-screen h-screen flex flex-col gap-5 bg-black p-5">
+            <form
+              onSubmit={handleSearch}
+              className="w-full flex justify-center items-center gap-2 mb-5"
+            >
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search for a video..."
+                className="w-1/2 p-2 text-black rounded-lg"
+              />
+              <button
+                type="submit"
+                className="bg-green-500 text-white px-4 py-2 rounded-lg"
+              >
+                Search
+              </button>
+            </form>
             {Loading ? (
               <div className="w-screen h-screen bg-black flex justify-center items-center">
                 <div className="w-[80px] h-[80px] bg-green-400 rounded-full animate-spin">
@@ -126,7 +144,9 @@ const Player = () => {
                           onTimeUpdate={handleVideoTimeUpdate}
                           onLoadedMetadata={handleLoadedMetadata}
                         />
-                        <div className="text-white mt-2">{video.snippet.title.substring(0, 50)}</div>
+                        <div className="text-white mt-2">
+                          {video.snippet.title.substring(0, 50)}
+                        </div>
                         <div className="text-slate-400">{video.snippet.channelTitle}</div>
                         <div className="w-full mt-2">
                           <input
@@ -150,7 +170,11 @@ const Player = () => {
                             className="bg-white rounded-full p-3"
                             onClick={handlePlayPause}
                           >
-                            {isPlaying ? <Pause size={50} color="black" /> : <Play size={50} color="black" />}
+                            {isPlaying ? (
+                              <Pause size={50} color="black" />
+                            ) : (
+                              <Play size={50} color="black" />
+                            )}
                           </button>
                           <button>
                             <SkipForward size={50} color="white" />
