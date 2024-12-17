@@ -171,9 +171,9 @@ const Player = () => {
                             onClick={handlePlayPause}
                           >
                             {isPlaying ? (
-                              <Pause size={50} color="black" />
+                              <Pause size={40} color="black" />
                             ) : (
-                              <Play size={50} color="black" />
+                              <Play size={40} color="black" />
                             )}
                           </button>
                           <button>
