@@ -14,6 +14,28 @@ const Player = () => {
   const [dummyLoading, setDummyLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
 
+
+
+  const [search,setsearch]=useState(true);
+  const [chat,setchat]=useState(false);
+  const [upnext,setupnext]=useState(false);
+
+  const selectsearch=()=>{
+    setsearch(true);
+    setchat(false);
+    setupnext(false);
+  }
+  const selectchat=()=>{
+    setsearch(false);
+    setchat(true);
+    setupnext(false);
+  }
+  const selectupnext=()=>{
+    setsearch(false);
+    setchat(false);
+    setupnext(true);
+  }
+
   const videoRef = React.useRef(null);
 
   const handleSearch = async (e) => {
@@ -31,7 +53,7 @@ const Player = () => {
         {
           params: {
             part: "snippet",
-            maxResults: 20, // Fetch top 20 matches
+            maxResults: 20,
             q: searchQuery,
             type: "video",
             key: "AIzaSyDf9v3RkpGo0PvUCW1b5U88y61grCrw9iE",
@@ -39,7 +61,7 @@ const Player = () => {
         }
       );
       setVideos(response.data.items);
-      setCurrentVideoIndex(0); // Reset to the first video
+      setCurrentVideoIndex(0);
     } catch (err) {
       setError(err.response?.data?.error?.message || "An error occurred while fetching videos.");
       console.error("Error fetching data from YouTube API:", err);
@@ -60,6 +82,9 @@ const Player = () => {
     if (currentVideoIndex > 0) {
       setCurrentVideoIndex((prevIndex) => prevIndex - 1);
     }
+    else {
+      toast("This is First video bro!", { icon: "🎉" });
+    }
   };
 
   useEffect(() => {
@@ -75,31 +100,13 @@ const Player = () => {
     <>
       <Toaster />
       {dummyLoading ? (
-        <div className="w-screen h-screen bg-black flex justify-center items-center">
+        <div className="w-screen h-auto bg-black flex justify-center items-center">
           <img src={loading_groic} alt="Loading" />
         </div>
       ) : (
         <>
           <PlayerNavbar />
-          <div className="w-screen h-screen flex flex-col gap-5 bg-black p-5">
-            <form
-              onSubmit={handleSearch}
-              className="w-full flex justify-center items-center gap-2 mb-5"
-            >
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search for a video..."
-                className="w-1/2 p-2 text-black rounded-lg"
-              />
-              <button
-                type="submit"
-                className="bg-green-500 text-white px-4 py-2 rounded-lg"
-              >
-                Search
-              </button>
-            </form>
+          <div className="w-screen h-auto flex flex-col gap-5 bg-black p-5 space-y-10">
             {loading ? (
               <div className="w-screen h-screen bg-black flex justify-center items-center">
                 <div className="w-[80px] h-[80px] bg-green-400 rounded-full animate-spin">
@@ -113,9 +120,8 @@ const Player = () => {
                     <p>{error}</p>
                   </div>
                 )}
-                {videos.length > 0 && (
                   <div className="w-full max-w-4xl rounded-lg shadow-lg overflow-hidden bg-black mx-auto">
-                    <div className="w-full h-full flex flex-col items-center p-4">
+                    <div className="w-full h-full flex flex-col items-center p-4 space-y-10">
                       <iframe
                         ref={videoRef}
                         src={`https://www.youtube.com/embed/${videos[currentVideoIndex]?.id?.videoId}?rel=0&enablejsapi=1`}
@@ -150,9 +156,47 @@ const Player = () => {
                       </div>
                     </div>
                   </div>
-                )}
               </>
             )}
+            <div className="w-screen h-auto">
+                <div className="w-[90%] bg-[#121212] rounded-lg text-white">
+                     <div className="w-full h-16 rounded-lg flex justify-between">
+                        <div className= {search?(`font-bold w-full flex justify-center items-end mb-2 border-b-2 border-0 pb-3`):(`w-full flex justify-center items-end mb-2  pb-3)`)} onClick={selectsearch}>
+                            <p className=''>SEARCH</p>
+                        </div>
+                        <div  className={chat?(`font-bold w-full flex justify-center items-end mb-2 border-b-2 border-0 pb-3`):(`w-full flex justify-center items-end mb-2  pb-3)`)} onClick={selectchat}>
+                        <p className="font-bold">CHAT</p>
+                        </div>
+                        <div  className={upnext?(`font-bold w-full flex justify-center items-end mb-2 border-b-2 border-0 pb-3`):(`w-full flex justify-center items-end mb-2  pb-3)`)} onClick={selectupnext}>
+                        <p className="font-bold">UPNEXT</p>
+                        </div>
+                     </div>
+                </div>
+            </div>
+          </div>
+          <div className="w-screen h-screen flex justify-center items-start bg-black">
+              <div className="w-[90%] h-[90%] bg-[#121212]">
+              <div className="w-full h-full flex justify-center items-end">
+              <form
+              onSubmit={handleSearch}
+              className="w-full flex justify-center items-center gap-2 mb-5"
+            >
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search for a video..."
+                className="w-1/2 p-2 text-black rounded-lg"
+              />
+              <button
+                type="submit"
+                className="bg-green-500 text-white px-4 py-2 rounded-lg"
+              >
+                Search
+              </button>
+            </form>
+            </div>
+              </div>
           </div>
         </>
       )}
