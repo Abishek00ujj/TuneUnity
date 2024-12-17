@@ -78,6 +78,7 @@ const Player = () => {
     toast.success("Public room created");
     setSearchQuery("omiya");
     handleSearch();
+    SetLoading(false);
     setTimeout(() => {
       toast.success("Abishek joined the room", { duration: 3000, icon: '😉' });
       SetdummyLoading(false);
