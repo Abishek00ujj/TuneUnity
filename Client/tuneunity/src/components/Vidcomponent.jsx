@@ -1,7 +1,7 @@
 import React from 'react'
 
 const Vidcomponent = (props) => {
-    console.log(props)
+   //  console.log(props)
   return (
     <div className='w-full h-[60px] bg-black text-white rounded-lg flex space-x-5'>
        <div className='w-[10%] h-full rounded-lg'>

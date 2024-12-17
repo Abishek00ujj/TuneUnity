@@ -8,13 +8,15 @@ import Vidcomponent from "./Vidcomponent";
 
 const Player = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [videoID,setVideoID]=useState(null);
   const [videos, setVideos] = useState([]);
+  const [relatedVideos, setRelatedVideos] = useState([]);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [dummyLoading, setDummyLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
-
+  
 
 
   const [search, setsearch] = useState(true);
@@ -42,11 +44,12 @@ const Player = () => {
   const handleSearch = async (e) => {
     if (e) e.preventDefault();
     setLoading(true);
-    if (searchQuery.trim() === "") {
+  
+    if (!searchQuery.trim()) {
       setLoading(false);
       return;
     }
-
+  
     try {
       setError(null);
       const response = await axios.get(
@@ -57,12 +60,16 @@ const Player = () => {
             maxResults: 20,
             q: searchQuery,
             type: "video",
-            key: "AIzaSyDf9v3RkpGo0PvUCW1b5U88y61grCrw9iE",
+            key: "AIzaSyCHKWtaE-RW-B5-13ZhH1pUkGYwWLYdOXY", 
           },
         }
       );
-      setVideos(response.data.items);
-      console.log(videos);
+  
+      const fetchedVideos = response.data.items;
+      if (!fetchedVideos || fetchedVideos.length === 0) {
+        throw new Error("No videos found for the given search query.");
+      }
+      setVideos(fetchedVideos);
       setCurrentVideoIndex(0);
     } catch (err) {
       setError(err.response?.data?.error?.message || "An error occurred while fetching videos.");
@@ -71,6 +78,7 @@ const Player = () => {
       setLoading(false);
     }
   };
+  
 
   const handleSkipForward = () => {
     if (currentVideoIndex < videos.length - 1) {
@@ -215,8 +223,11 @@ const Player = () => {
             {
               chat && (
                 <>
-                  <div className="w-[90%] h-[90%] bg-[#121212]">
-
+                  <div className="w-[90%] h-[90%] bg-[#121212] flex justify-center items-end">
+                       <div>
+                           <input className="pl-5 pr-5 pt-3 pb-3" type="text" name="" id="" />
+                           <button>send</button>
+                       </div>
                   </div>
                 </>
               )
