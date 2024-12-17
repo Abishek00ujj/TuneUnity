@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { SkipBack, SkipForward, Play, Pause } from "lucide-react";
+import { SkipBack, SkipForward, Play, Pause,SendHorizontal } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import loading_groic from "../assets/loading_groic.gif";
 import PlayerNavbar from "./PlayerNavbar";
 import Vidcomponent from "./Vidcomponent";
-
+import Text from './Text'
 const Player = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [videoID,setVideoID]=useState(null);
@@ -17,6 +17,8 @@ const Player = () => {
   const [dummyLoading, setDummyLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   
+
+  const [message,setmessage]=useState([]);
 
 
   const [search, setsearch] = useState(true);
@@ -187,15 +189,20 @@ const Player = () => {
           </div>
           <div className="w-screen h-screen flex flex-col justify-center items-center bg-black">
             {
-              search && (
+              search ? (
                 <>
                   <div className="w-[90%] h-[70%] bg-[#121212] overflow-scroll overflow-y-auto">
-                    {videos &&
+                    {videos ?(
                       videos.map((item, index) => {
                         return (
                           <Vidcomponent data={item} />
                         );
-                      })}
+                      })):(
+                        <div className="w-[90%] h-[70%] bg-[#121212] overflow-scroll overflow-y-auto flex justify-center items-center">
+                        <p className="text-white font-semibold text-[10px]">Enter song name and press enter</p>
+                        </div>
+                      )
+                    }
                   </div>
                   <div className="w-full flex justify-center items-end">
                     <form
@@ -218,15 +225,20 @@ const Player = () => {
                     </form>
                   </div>
                 </>
+              ):(
+                null
               )
             }
             {
               chat && (
                 <>
-                  <div className="w-[90%] h-[90%] bg-[#121212] flex justify-center items-end">
-                       <div>
-                           <input className="pl-5 pr-5 pt-3 pb-3" type="text" name="" id="" />
-                           <button>send</button>
+                  <div className="w-[90%] h-[90%] bg-[#121212] flex flex-col">
+                       <div className="w-[100%] h-full flex flex-col overflow-scroll overflow-y-auto">
+                          <Text/>
+                       </div>
+                       <div className="w-full flex justify-center items-end space-x-5 p-4">
+                           <input className="pl-8 pr-8 pt-4 pb-4 rounded-xl bg-[#252323] text-white" type="text" name="" id="" placeholder="Type a Message"  />
+                            <SendHorizontal size={45} fill="white" color="green"/>
                        </div>
                   </div>
                 </>
