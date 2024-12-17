@@ -4,6 +4,7 @@ import { SkipBack, SkipForward, Play, Pause } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import loading_groic from "../assets/loading_groic.gif";
 import PlayerNavbar from "./PlayerNavbar";
+import Vidcomponent from "./Vidcomponent";
 
 const Player = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -16,21 +17,21 @@ const Player = () => {
 
 
 
-  const [search,setsearch]=useState(true);
-  const [chat,setchat]=useState(false);
-  const [upnext,setupnext]=useState(false);
+  const [search, setsearch] = useState(true);
+  const [chat, setchat] = useState(false);
+  const [upnext, setupnext] = useState(false);
 
-  const selectsearch=()=>{
+  const selectsearch = () => {
     setsearch(true);
     setchat(false);
     setupnext(false);
   }
-  const selectchat=()=>{
+  const selectchat = () => {
     setsearch(false);
     setchat(true);
     setupnext(false);
   }
-  const selectupnext=()=>{
+  const selectupnext = () => {
     setsearch(false);
     setchat(false);
     setupnext(true);
@@ -61,6 +62,7 @@ const Player = () => {
         }
       );
       setVideos(response.data.items);
+      console.log(videos);
       setCurrentVideoIndex(0);
     } catch (err) {
       setError(err.response?.data?.error?.message || "An error occurred while fetching videos.");
@@ -100,7 +102,7 @@ const Player = () => {
     <>
       <Toaster />
       {dummyLoading ? (
-        <div className="w-screen h-auto bg-black flex justify-center items-center">
+        <div className="w-screen h-screen bg-black flex justify-center items-center">
           <img src={loading_groic} alt="Loading" />
         </div>
       ) : (
@@ -120,83 +122,119 @@ const Player = () => {
                     <p>{error}</p>
                   </div>
                 )}
-                  <div className="w-full max-w-4xl rounded-lg shadow-lg overflow-hidden bg-black mx-auto">
-                    <div className="w-full h-full flex flex-col items-center p-4 space-y-10">
-                      <iframe
-                        ref={videoRef}
-                        src={`https://www.youtube.com/embed/${videos[currentVideoIndex]?.id?.videoId}?rel=0&enablejsapi=1`}
-                        title={videos[currentVideoIndex]?.snippet?.title}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                        className="w-full h-64 sm:h-80"
-                      />
-                      <div className="text-white mt-2">
-                        {videos[currentVideoIndex]?.snippet?.title.substring(0, 50)}
-                      </div>
-                      <div className="text-slate-400">
-                        {videos[currentVideoIndex]?.snippet?.channelTitle}
-                      </div>
-                      <div className="w-full flex justify-around mt-4">
-                        <button onClick={handleSkipBackward}>
-                          <SkipBack size={50} color="white" />
-                        </button>
-                        <button
-                          className="bg-white rounded-full p-3"
-                          onClick={() => setIsPlaying(!isPlaying)}
-                        >
-                          {isPlaying ? (
-                            <Pause size={40} color="black" />
-                          ) : (
-                            <Play size={40} color="black" />
-                          )}
-                        </button>
-                        <button onClick={handleSkipForward}>
-                          <SkipForward size={50} color="white" />
-                        </button>
-                      </div>
+                <div className="w-full max-w-4xl rounded-lg shadow-lg overflow-hidden bg-black mx-auto">
+                  <div className="w-full h-full flex flex-col items-center p-4 space-y-10 rounded-2xl">
+                    <iframe
+                      ref={videoRef}
+                      src={`https://www.youtube.com/embed/${videos[currentVideoIndex]?.id?.videoId}?autoplay=1&controls=0&rel=0&modestbranding=1&enablejsapi=1`}
+                      title={videos[currentVideoIndex]?.snippet?.title}
+                      allow="autoplay; encrypted-media"
+                      allowFullScreen
+                      className="w-full h-64 sm:h-80 rounded-2xl"
+                    />
+
+                    <div className="text-white mt-2">
+                      {videos[currentVideoIndex]?.snippet?.title.substring(0, 50)}
+                    </div>
+                    <div className="text-slate-400">
+                      {videos[currentVideoIndex]?.snippet?.channelTitle}
+                    </div>
+                    <div className="w-full flex justify-around mt-4">
+                      <button onClick={handleSkipBackward}>
+                        <SkipBack size={50} color="white" />
+                      </button>
+                      <button
+                        className="bg-white rounded-full p-3"
+                        onClick={() => setIsPlaying(!isPlaying)}
+                      >
+                        {isPlaying ? (
+                          <Pause size={40} color="black" />
+                        ) : (
+                          <Play size={40} color="black" />
+                        )}
+                      </button>
+                      <button onClick={handleSkipForward}>
+                        <SkipForward size={50} color="white" />
+                      </button>
                     </div>
                   </div>
+                </div>
               </>
             )}
-            <div className="w-screen h-auto">
-                <div className="w-[90%] bg-[#121212] rounded-lg text-white">
-                     <div className="w-full h-16 rounded-lg flex justify-between">
-                        <div className= {search?(`font-bold w-full flex justify-center items-end mb-2 border-b-2 border-0 pb-3`):(`w-full flex justify-center items-end mb-2  pb-3)`)} onClick={selectsearch}>
-                            <p className=''>SEARCH</p>
-                        </div>
-                        <div  className={chat?(`font-bold w-full flex justify-center items-end mb-2 border-b-2 border-0 pb-3`):(`w-full flex justify-center items-end mb-2  pb-3)`)} onClick={selectchat}>
-                        <p className="font-bold">CHAT</p>
-                        </div>
-                        <div  className={upnext?(`font-bold w-full flex justify-center items-end mb-2 border-b-2 border-0 pb-3`):(`w-full flex justify-center items-end mb-2  pb-3)`)} onClick={selectupnext}>
-                        <p className="font-bold">UPNEXT</p>
-                        </div>
-                     </div>
+            <div className="w-screen h-auto rounded-xl mt-20">
+              <div className="w-[90%] bg-[#121212] rounded-xl text-white">
+                <div className="w-full h-16 rounded-lg flex justify-between">
+                  <div className={search ? (`font-bold w-full flex justify-center items-end border-b-2 border-0 pb-3`) : (`w-full flex justify-center items-end mb-2  pb-3)`)} onClick={selectsearch}>
+                    <p className=''>SEARCH</p>
+                  </div>
+                  <div className={chat ? (`font-bold w-full flex justify-center items-end  border-b-2 border-0 pb-3`) : (`w-full flex justify-center items-end mb-2  pb-3)`)} onClick={selectchat}>
+                    <p className="font-bold">CHAT</p>
+                  </div>
+                  <div className={upnext ? (`font-bold w-full flex justify-center items-end  border-b-2 border-0 pb-3`) : (`w-full flex justify-center items-end mb-2  pb-3)`)} onClick={selectupnext}>
+                    <p className="font-bold">UPNEXT</p>
+                  </div>
                 </div>
+              </div>
             </div>
           </div>
-          <div className="w-screen h-screen flex justify-center items-start bg-black">
-              <div className="w-[90%] h-[90%] bg-[#121212]">
-              <div className="w-full h-full flex justify-center items-end">
-              <form
-              onSubmit={handleSearch}
-              className="w-full flex justify-center items-center gap-2 mb-5"
-            >
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search for a video..."
-                className="w-1/2 p-2 text-black rounded-lg"
-              />
-              <button
-                type="submit"
-                className="bg-green-500 text-white px-4 py-2 rounded-lg"
-              >
-                Search
-              </button>
-            </form>
-            </div>
-              </div>
+          <div className="w-screen h-screen flex flex-col justify-center items-center bg-black">
+            {
+              search && (
+                <>
+                  <div className="w-[90%] h-[70%] bg-[#121212] overflow-scroll overflow-y-auto">
+                    {videos &&
+                      videos.map((item, index) => {
+                        return (
+                          <Vidcomponent data={item} />
+                        );
+                      })}
+                  </div>
+                  <div className="w-full flex justify-center items-end">
+                    <form
+                      onSubmit={handleSearch}
+                      className="w-full flex justify-center items-center gap-2 mb-5"
+                    >
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search for a video..."
+                        className="w-1/2 p-2 text-black rounded-lg"
+                      />
+                      <button
+                        type="submit"
+                        className="bg-green-500 text-white px-4 py-2 rounded-lg"
+                      >
+                        Search
+                      </button>
+                    </form>
+                  </div>
+                </>
+              )
+            }
+            {
+              chat && (
+                <>
+                  <div className="w-[90%] h-[90%] bg-[#121212]">
+
+                  </div>
+                </>
+              )
+            }
+            {
+              upnext && (
+                <>
+                  <div className="w-[90%] h-[90%] overflow-scroll overflow-y-auto bg-[#121212]">
+                    {videos &&
+                      videos.map((item, index) => {
+                        return (
+                          <Vidcomponent data={item} />
+                        );
+                      })}
+                  </div>
+                </>
+              )
+            }
           </div>
         </>
       )}
