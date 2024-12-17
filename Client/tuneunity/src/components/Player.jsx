@@ -8,24 +8,22 @@ import PlayerNavbar from "./PlayerNavbar";
 const Player = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [videos, setVideos] = useState([]);
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const [error, setError] = useState(null);
-  const [Loading, SetLoading] = useState(false);
-  const [dummyLoading, SetdummyLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [dummyLoading, setDummyLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
 
   const videoRef = React.useRef(null);
-  let lastSearch = "";
 
   const handleSearch = async (e) => {
     if (e) e.preventDefault();
-    SetLoading(true);
-    if (searchQuery.trim() === "" || searchQuery.trim() === lastSearch) {
-      SetLoading(false);
+    setLoading(true);
+    if (searchQuery.trim() === "") {
+      setLoading(false);
       return;
     }
-    lastSearch = searchQuery.trim();
+
     try {
       setError(null);
       const response = await axios.get(
@@ -33,7 +31,7 @@ const Player = () => {
         {
           params: {
             part: "snippet",
-            maxResults: 1,
+            maxResults: 20, // Fetch top 20 matches
             q: searchQuery,
             type: "video",
             key: "AIzaSyDf9v3RkpGo0PvUCW1b5U88y61grCrw9iE",
@@ -41,47 +39,35 @@ const Player = () => {
         }
       );
       setVideos(response.data.items);
+      setCurrentVideoIndex(0); // Reset to the first video
     } catch (err) {
       setError(err.response?.data?.error?.message || "An error occurred while fetching videos.");
       console.error("Error fetching data from YouTube API:", err);
     } finally {
-      SetLoading(false);
+      setLoading(false);
     }
   };
 
-  const handlePlayPause = () => {
-    if (isPlaying) {
-      videoRef.current.pause();
+  const handleSkipForward = () => {
+    if (currentVideoIndex < videos.length - 1) {
+      setCurrentVideoIndex((prevIndex) => prevIndex + 1);
     } else {
-      videoRef.current.play();
-    }
-    setIsPlaying(!isPlaying);
-  };
-
-  const handleVideoTimeUpdate = () => {
-    if (videoRef.current) {
-      setCurrentTime(videoRef.current.currentTime);
+      toast("You've reached the last video!", { icon: "🎉" });
     }
   };
 
-  const handleLoadedMetadata = () => {
-    if (videoRef.current) {
-      setDuration(videoRef.current.duration);
+  const handleSkipBackward = () => {
+    if (currentVideoIndex > 0) {
+      setCurrentVideoIndex((prevIndex) => prevIndex - 1);
     }
-  };
-
-  const formatTime = (time) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
   };
 
   useEffect(() => {
     toast.success("Public room created");
-    SetLoading(false);
+    setLoading(false);
     setTimeout(() => {
       toast.success("Abishek joined the room", { duration: 3000, icon: "😉" });
-      SetdummyLoading(false);
+      setDummyLoading(false);
     }, 3000);
   }, []);
 
@@ -114,7 +100,7 @@ const Player = () => {
                 Search
               </button>
             </form>
-            {Loading ? (
+            {loading ? (
               <div className="w-screen h-screen bg-black flex justify-center items-center">
                 <div className="w-[80px] h-[80px] bg-green-400 rounded-full animate-spin">
                   <div className="w-[100px] h-[100px] bg-black rounded-full animate-spin"></div>
@@ -127,63 +113,44 @@ const Player = () => {
                     <p>{error}</p>
                   </div>
                 )}
-                <div className="flex flex-wrap justify-center items-center gap-5">
-                  {videos.map((video) => (
-                    <div
-                      key={video.id.videoId}
-                      className="w-full max-w-4xl rounded-lg shadow-lg overflow-hidden bg-black"
-                    >
-                      <div className="w-full h-full flex flex-col items-center p-4">
-                        <iframe
-                          ref={videoRef}
-                          src={`https://www.youtube.com/embed/${video.id.videoId}?rel=0&enablejsapi=1&controls=0`}
-                          title={video.snippet.title}
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                          className="w-full h-64 sm:h-80"
-                          onTimeUpdate={handleVideoTimeUpdate}
-                          onLoadedMetadata={handleLoadedMetadata}
-                        />
-                        <div className="text-white mt-2">
-                          {video.snippet.title.substring(0, 50)}
-                        </div>
-                        <div className="text-slate-400">{video.snippet.channelTitle}</div>
-                        <div className="w-full mt-2">
-                          <input
-                            type="range"
-                            min="0"
-                            max={duration}
-                            value={currentTime}
-                            onChange={(e) => (videoRef.current.currentTime = e.target.value)}
-                            className="w-full"
-                          />
-                          <div className="flex justify-between text-white text-sm">
-                            <span>{formatTime(currentTime)}</span>
-                            <span>{formatTime(duration)}</span>
-                          </div>
-                        </div>
-                        <div className="w-full flex justify-around mt-4">
-                          <button>
-                            <SkipBack size={50} color="white" />
-                          </button>
-                          <button
-                            className="bg-white rounded-full p-3"
-                            onClick={handlePlayPause}
-                          >
-                            {isPlaying ? (
-                              <Pause size={40} color="black" />
-                            ) : (
-                              <Play size={40} color="black" />
-                            )}
-                          </button>
-                          <button>
-                            <SkipForward size={50} color="white" />
-                          </button>
-                        </div>
+                {videos.length > 0 && (
+                  <div className="w-full max-w-4xl rounded-lg shadow-lg overflow-hidden bg-black mx-auto">
+                    <div className="w-full h-full flex flex-col items-center p-4">
+                      <iframe
+                        ref={videoRef}
+                        src={`https://www.youtube.com/embed/${videos[currentVideoIndex]?.id?.videoId}?rel=0&enablejsapi=1`}
+                        title={videos[currentVideoIndex]?.snippet?.title}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        className="w-full h-64 sm:h-80"
+                      />
+                      <div className="text-white mt-2">
+                        {videos[currentVideoIndex]?.snippet?.title.substring(0, 50)}
+                      </div>
+                      <div className="text-slate-400">
+                        {videos[currentVideoIndex]?.snippet?.channelTitle}
+                      </div>
+                      <div className="w-full flex justify-around mt-4">
+                        <button onClick={handleSkipBackward}>
+                          <SkipBack size={50} color="white" />
+                        </button>
+                        <button
+                          className="bg-white rounded-full p-3"
+                          onClick={() => setIsPlaying(!isPlaying)}
+                        >
+                          {isPlaying ? (
+                            <Pause size={40} color="black" />
+                          ) : (
+                            <Play size={40} color="black" />
+                          )}
+                        </button>
+                        <button onClick={handleSkipForward}>
+                          <SkipForward size={50} color="white" />
+                        </button>
                       </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                )}
               </>
             )}
           </div>
