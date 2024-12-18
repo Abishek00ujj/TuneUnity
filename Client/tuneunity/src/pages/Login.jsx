@@ -52,6 +52,7 @@ export const Login = () => {
                 email: decodedToken.email,
                 picture: decodedToken.picture,
               };
+              console.log("Data:"+JSON.stringify(userData));
               localStorage.setItem('userdata', JSON.stringify(userData));
               console.log(localStorage.getItem('userdata'));
               if (credential) {

@@ -18,7 +18,7 @@ export const Home = () => {
   }
   useEffect(() => {
     setTimeout(() => {
-      toast("You're using the beta version of TuneUnity🎉❤️. Report issues at support.tuneunity@gmail.com",{
+      toast("You're using the beta version of TuneUnity🎉❤️.Report issues at support.tuneunity@gmail.com",{
         position:'top-center',
         icon:"😊",
         duration: 3000 
@@ -38,7 +38,7 @@ export const Home = () => {
         ):
         (
             <>
-                <Navbar/>
+     <Navbar/>
      <div className='w-screen h-screen bg-black flex flex-col'>
          <div className='w-screen flex space-x-5 justify-center h-28'>
             <Link to='/player' className='font-semibold bg-white text-black w-[45%] h-14 rounded-sm flex justify-center items-center'><div >New Room</div></Link>

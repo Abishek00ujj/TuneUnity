@@ -7,6 +7,8 @@ import PlayerNavbar from "./PlayerNavbar";
 import Vidcomponent from "./Vidcomponent";
 import Text from './Text'
 const Player = () => {
+  const data=localStorage.getItem('userdata');
+  const userData=JSON.parse(data);
   const [searchQuery, setSearchQuery] = useState("");
   const [videoID,setVideoID]=useState(null);
   const [videos, setVideos] = useState([]);
@@ -16,8 +18,6 @@ const Player = () => {
   const [loading, setLoading] = useState(false);
   const [dummyLoading, setDummyLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
-  
-
   const [message,setmessage]=useState([]);
 
 
@@ -103,7 +103,7 @@ const Player = () => {
     toast.success("Public room created");
     setLoading(false);
     setTimeout(() => {
-      toast.success("Abishek joined the room", { duration: 3000, icon: "😉" });
+      toast.success(`${userData.name} joined the room`, { duration: 3000, icon: "😉" });
       setDummyLoading(false);
     }, 3000);
   }, []);
