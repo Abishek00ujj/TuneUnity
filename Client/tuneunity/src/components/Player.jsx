@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { SkipBack, SkipForward, Play, Pause, SendHorizontal } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
@@ -6,14 +6,16 @@ import loading_groic from "../assets/loading_groic.gif";
 import PlayerNavbar from "./PlayerNavbar";
 import Vidcomponent from "./Vidcomponent";
 import io from 'socket.io-client'
-import Text from './Text'
-
-
-
+import MyText from './MyText'
+import HerText from "./HerText";
+import AdminText from "./AdminText";
+import { nanoid } from 'nanoid';
 let socket;
+let id;
 const Player = () => {
   const data = localStorage.getItem('userdata');
   const userData = JSON.parse(data);
+  console.log(userData.name);
   const [searchQuery, setSearchQuery] = useState("");
   const [videoID, setVideoID] = useState(null);
   const [videos, setVideos] = useState([]);
@@ -23,12 +25,14 @@ const Player = () => {
   const [loading, setLoading] = useState(false);
   const [dummyLoading, setDummyLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [message, setmessage] = useState([]);
+  const [messages, setmessages] = useState([]);
 
   const [search, setsearch] = useState(true);
   const [chat, setchat] = useState(false);
   const [upnext, setupnext] = useState(false);
+  const [chats,setChats]=useState([]);
 
+   const messageRef=useRef(null);
   const selectsearch = () => {
     setsearch(true);
     setchat(false);
@@ -104,16 +108,43 @@ const Player = () => {
   };
   
    const backendURL='http://localhost:199';
-  useEffect(() => {
+   useEffect(() => {
     toast.success("Public room created");
     socket=io(backendURL);
+   id = nanoid(6);
+    socket.emit('join',{name:userData.name,room:id},(error)=>{
+         if(error)
+         {
+           alert(error);
+         }
+    });
     setLoading(false);
     setTimeout(() => {
       toast.success(`${userData.name} joined the room`, { duration: 3000, icon: "😉" });
       setDummyLoading(false);
     }, 3000);
+    return ()=>{
+      socket.disconnect();
+      socket.off();
+    }
   }, []);
+  const sendMessage=(e)=>{
+    e.preventDefault();
+    socket.emit('sendMessage',messageRef.current.value,()=>setmessages(""));
+    messageRef.current.value='';
+  }
 
+  useEffect(()=>{
+      socket.on('toastmessage',msg=>{
+        setmessages((prevMessages) => [...prevMessages, msg]);
+        toast.success(`${msg.text}`, { duration: 3000, icon: "😉" });
+      });
+      socket.on('message',msg=>{
+        setChats((prevMessages) => [...prevMessages, msg]);
+      });
+      console.log(chats);
+  },[]);
+  console.log(chats);
   return (
     <>
       <Toaster />
@@ -123,7 +154,7 @@ const Player = () => {
         </div>
       ) : (
         <>
-          <PlayerNavbar />
+          <PlayerNavbar id={id}/>
           <div className="w-screen h-auto flex flex-col gap-5 bg-black p-5 space-y-10">
             {loading ? (
               <div className="w-screen h-screen bg-black flex justify-center items-center">
@@ -240,11 +271,25 @@ const Player = () => {
                 <>
                   <div className="w-[90%] h-[90%] bg-[#121212] flex flex-col">
                     <div className="w-[100%] h-full flex flex-col overflow-scroll overflow-y-auto">
-                      <Text />
+                      {
+                        chats&&(chats.map((item,index)=>{
+                           if(item.user.toLowerCase()==userData.name.toLowerCase())
+                           {
+                           return <MyText text={item.text} name={item.user}/>;
+                           }
+                           else if(item.user.toLowerCase()=='admin')
+                           {
+                            return <AdminText text={item.text} name={item.user}/>;
+                           }
+                           else{
+                            return <HerText text={item.text} name={item.user}/>;
+                           }
+                        }))
+                      }
                     </div>
                     <div className="w-full flex justify-center items-end space-x-5 p-4">
-                      <input className="pl-8 pr-8 pt-4 pb-4 rounded-xl bg-[#252323] text-white" type="text" name="" id="" placeholder="Type a Message" />
-                      <SendHorizontal size={45} fill="white" color="green" />
+                      <input ref={messageRef} className="pl-8 pr-8 pt-4 pb-4 rounded-xl bg-[#252323] text-white" type="text" name="" id="" placeholder="Type a Message" onKeyPress={(e)=>e.key=='Enter'?sendMessage():null} />
+                      <SendHorizontal size={45} fill="white" color="green" onClick={sendMessage} />
                     </div>
                   </div>
                 </>

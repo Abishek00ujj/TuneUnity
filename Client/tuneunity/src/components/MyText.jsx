@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Text = () => {
+const MyText = (props) => {
     function getFormattedTime() {
         const now = new Date();
         let hours = now.getHours();
@@ -14,13 +14,13 @@ const Text = () => {
       }
   return (
     <div className='w-full h-auto flex text-white flex flex-col items-end'>
-        <div className='w-[60%] bg-[#252323] p-3 m-5 rounded-md'>
-        <p className=''>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Dicta veritatis quis magnam eos commodi officiis accusantium quasi molestias quas fugit! Quae ipsum quo fugiat explicabo? Officiis nemo deserunt ex nesciunt!</p>
+        <div className='w-[60%] bg-[#252323] pl-3 pr-3 pt-2 pb-2 m-2 rounded-md'>
+          <div className='w-full flex justify-start font-light text-green-500'>Me</div>
+           <p className=''>{props.text}</p>
         <p className='w-full flex justify-end'>{getFormattedTime()}</p>
         </div>
     </div>
-
   )
 }
 
-export default Text
+export default MyText
