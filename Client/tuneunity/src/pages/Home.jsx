@@ -5,8 +5,9 @@ import tuneunitybg from '../assets/tuneunitybg.jpg';
 import {X} from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast';
 import loading_groic from '../assets/loading_groic.gif'
-const Home = () => {
+export const Home = () => {
   const [downbar1, setDownbar1] = useState(false);
+  const [logout,setlogout]=useState(true);
   const notify = (message) => toast(message,{
     position:'top-center',
     icon:"😊"

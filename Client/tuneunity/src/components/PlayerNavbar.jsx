@@ -3,6 +3,8 @@ import {PartyPopper,Share2,DoorClosed} from 'lucide-react';
 import logogroic from '../assets/logo-groic.png'
 import {Link} from 'react-router-dom'
 export const PlayerNavbar = () => {
+  const data=localStorage.getItem('userdata');
+  console.log(data);
   return (
     <div className='w-screen h-20 bg-black flex justify-between items-center'>
         <div className='w-[100px]'> 
