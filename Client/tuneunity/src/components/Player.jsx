@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { SkipBack, SkipForward, Play, Pause,SendHorizontal } from "lucide-react";
+import { SkipBack, SkipForward, Play, Pause, SendHorizontal } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import loading_groic from "../assets/loading_groic.gif";
 import PlayerNavbar from "./PlayerNavbar";
 import Vidcomponent from "./Vidcomponent";
+import io from 'socket.io-client'
 import Text from './Text'
+
+
+
+let socket;
 const Player = () => {
-  const data=localStorage.getItem('userdata');
-  const userData=JSON.parse(data);
+  const data = localStorage.getItem('userdata');
+  const userData = JSON.parse(data);
   const [searchQuery, setSearchQuery] = useState("");
-  const [videoID,setVideoID]=useState(null);
+  const [videoID, setVideoID] = useState(null);
   const [videos, setVideos] = useState([]);
   const [relatedVideos, setRelatedVideos] = useState([]);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
@@ -18,8 +23,7 @@ const Player = () => {
   const [loading, setLoading] = useState(false);
   const [dummyLoading, setDummyLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [message,setmessage]=useState([]);
-
+  const [message, setmessage] = useState([]);
 
   const [search, setsearch] = useState(true);
   const [chat, setchat] = useState(false);
@@ -46,12 +50,12 @@ const Player = () => {
   const handleSearch = async (e) => {
     if (e) e.preventDefault();
     setLoading(true);
-  
+
     if (!searchQuery.trim()) {
       setLoading(false);
       return;
     }
-  
+
     try {
       setError(null);
       const response = await axios.get(
@@ -62,11 +66,11 @@ const Player = () => {
             maxResults: 20,
             q: searchQuery,
             type: "video",
-            key: "AIzaSyCHKWtaE-RW-B5-13ZhH1pUkGYwWLYdOXY", 
+            key: "AIzaSyCHKWtaE-RW-B5-13ZhH1pUkGYwWLYdOXY",
           },
         }
       );
-  
+
       const fetchedVideos = response.data.items;
       if (!fetchedVideos || fetchedVideos.length === 0) {
         throw new Error("No videos found for the given search query.");
@@ -80,7 +84,7 @@ const Player = () => {
       setLoading(false);
     }
   };
-  
+
 
   const handleSkipForward = () => {
     if (currentVideoIndex < videos.length - 1) {
@@ -98,9 +102,11 @@ const Player = () => {
       toast("This is First video bro!", { icon: "🎉" });
     }
   };
-
+  
+   const backendURL='http://localhost:199';
   useEffect(() => {
     toast.success("Public room created");
+    socket=io(backendURL);
     setLoading(false);
     setTimeout(() => {
       toast.success(`${userData.name} joined the room`, { duration: 3000, icon: "😉" });
@@ -192,16 +198,16 @@ const Player = () => {
               search ? (
                 <>
                   <div className="w-[90%] h-[70%] bg-[#121212] overflow-scroll overflow-y-auto">
-                    {videos ?(
+                    {videos ? (
                       videos.map((item, index) => {
                         return (
                           <Vidcomponent data={item} />
                         );
-                      })):(
-                        <div className="w-[90%] h-[70%] bg-[#121212] overflow-scroll overflow-y-auto flex justify-center items-center">
+                      })) : (
+                      <div className="w-[90%] h-[70%] bg-[#121212] overflow-scroll overflow-y-auto flex justify-center items-center">
                         <p className="text-white font-semibold text-[10px]">Enter song name and press enter</p>
-                        </div>
-                      )
+                      </div>
+                    )
                     }
                   </div>
                   <div className="w-full flex justify-center items-end">
@@ -225,7 +231,7 @@ const Player = () => {
                     </form>
                   </div>
                 </>
-              ):(
+              ) : (
                 null
               )
             }
@@ -233,13 +239,13 @@ const Player = () => {
               chat && (
                 <>
                   <div className="w-[90%] h-[90%] bg-[#121212] flex flex-col">
-                       <div className="w-[100%] h-full flex flex-col overflow-scroll overflow-y-auto">
-                          <Text/>
-                       </div>
-                       <div className="w-full flex justify-center items-end space-x-5 p-4">
-                           <input className="pl-8 pr-8 pt-4 pb-4 rounded-xl bg-[#252323] text-white" type="text" name="" id="" placeholder="Type a Message"  />
-                            <SendHorizontal size={45} fill="white" color="green"/>
-                       </div>
+                    <div className="w-[100%] h-full flex flex-col overflow-scroll overflow-y-auto">
+                      <Text />
+                    </div>
+                    <div className="w-full flex justify-center items-end space-x-5 p-4">
+                      <input className="pl-8 pr-8 pt-4 pb-4 rounded-xl bg-[#252323] text-white" type="text" name="" id="" placeholder="Type a Message" />
+                      <SendHorizontal size={45} fill="white" color="green" />
+                    </div>
                   </div>
                 </>
               )
