@@ -40,7 +40,7 @@ const Home = () => {
                 <Navbar/>
      <div className='w-screen h-screen bg-black flex flex-col'>
          <div className='w-screen flex space-x-5 justify-center h-28'>
-            <Link to='player' className='font-semibold bg-white text-black w-[45%] h-14 rounded-sm flex justify-center items-center'><div >New Room</div></Link>
+            <Link to='/player' className='font-semibold bg-white text-black w-[45%] h-14 rounded-sm flex justify-center items-center'><div >New Room</div></Link>
             <div className='font-semibold text-white border border-white w-[45%] h-14 rounded-sm flex justify-center items-center' onClick={handleDownBar1}>Join with code</div>
          </div>
          <div className='w-screen h-[500%] flex flex-col space-y-5 justify-center items-center'>
