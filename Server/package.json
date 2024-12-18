@@ -1,0 +1,23 @@
+{
+  "name": "tuneunity",
+  "version": "1.0.0",
+  "description": "TuneUnity : Listen Music Together ❤️🎉",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Abishek00ujj/TuneUnity.git"
+  },
+  "author": "Abishek",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Abishek00ujj/TuneUnity/issues"
+  },
+  "homepage": "https://github.com/Abishek00ujj/TuneUnity#readme",
+  "dependencies": {
+    "express": "^4.21.2",
+    "socket.io": "^4.8.1"
+  }
+}
