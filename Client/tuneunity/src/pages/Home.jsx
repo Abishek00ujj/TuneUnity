@@ -15,7 +15,7 @@ export const Home = () => {
   const [loading, setLoading] = useState(true);
 
   const idref = useRef(null);
-  const backendURL = 'http://localhost:199';
+  const backendURL = 'https://tuneunity-1.onrender.com';
   const userData = JSON.parse(localStorage.getItem('userdata'));
 
   const notify = (message, icon = "😊") =>
