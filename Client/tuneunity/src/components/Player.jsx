@@ -111,7 +111,7 @@ const Player = () => {
    useEffect(() => {
     toast.success("Public room created");
     socket=io(backendURL);
-   id = nanoid(6);
+   id = '1234'
     socket.emit('join',{name:userData.name,room:id},(error)=>{
          if(error)
          {

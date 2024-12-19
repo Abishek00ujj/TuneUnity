@@ -46,14 +46,14 @@ export const Home = () => {
     });
   };
 
-  useEffect(() => {
-    socket = io(backendURL);
+  // useEffect(() => {
+  //   socket = io(backendURL);
 
-    socket.on('toastmessage', (msg) => {
-      toast.success(`${msg.text}`, { duration: 3000, icon: "😉" });
-      setRedirect(true);
-    });
-  }, [backendURL]);
+  //   socket.on('toastmessage', (msg) => {
+  //     toast.success(`${msg.text}`, { duration: 3000, icon: "😉" });
+  //     setRedirect(true);
+  //   });
+  // }, [backendURL]);
 
   useEffect(() => {
     setTimeout(() => {
