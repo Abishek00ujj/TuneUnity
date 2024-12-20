@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { SkipBack, SkipForward, Play, Pause, SendHorizontal } from "lucide-react";
+import { SkipBack, SkipForward, Play, Pause, SendHorizontal, Slice } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import loading_groic from "../assets/loading_groic.gif";
 import PlayerNavbar from "./PlayerNavbar";
@@ -29,7 +29,7 @@ const Player = () => {
   const [dummyLoading, setDummyLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [messages, setmessages] = useState([]);
-
+  const [chatSong,SetchatSong]=useState(null);
   const [search, setsearch] = useState(true);
   const [chat, setchat] = useState(false);
   const [upnext, setupnext] = useState(false);
@@ -58,7 +58,8 @@ const Player = () => {
     if (e) e.preventDefault();
     setLoading(true);
 
-    if (!searchQuery.trim()) {
+    const searchTerm = searchQuery.trim() || chatSong;
+    if (!searchTerm) {
       setLoading(false);
       return;
     }
@@ -71,7 +72,7 @@ const Player = () => {
           params: {
             part: "snippet",
             maxResults: 20,
-            q: searchQuery,
+            q: searchQuery||chatSong,
             type: "video",
             key: "AIzaSyCHKWtaE-RW-B5-13ZhH1pUkGYwWLYdOXY",
           },
@@ -147,11 +148,19 @@ const Player = () => {
       console.log(chats);
   },[]);
   console.log(chats);
-  // useEffect(() => {
-  //   if (lastMessageRef.current) {
-  //     lastMessageRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-  //   }
-  // }, [chats]);
+  useEffect(() => {
+    if (chats.length > 0 && chats[chats.length - 1].text.charAt(0) === '!') {
+      let x = chats[chats.length - 1].text.slice(1);
+      console.log(x);
+      SetchatSong(x);
+    }
+  }, [chats]);
+  useEffect(() => {
+    if (chatSong) {
+      handleSearch();
+    }
+  }, [chatSong]);
+
   return (
     <>
       <Toaster />
