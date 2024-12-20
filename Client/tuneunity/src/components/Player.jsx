@@ -147,11 +147,11 @@ const Player = () => {
       console.log(chats);
   },[]);
   console.log(chats);
-  useEffect(() => {
-    if (lastMessageRef.current) {
-      lastMessageRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-    }
-  }, [chats]);
+  // useEffect(() => {
+  //   if (lastMessageRef.current) {
+  //     lastMessageRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  //   }
+  // }, [chats]);
   return (
     <>
       <Toaster />
@@ -235,7 +235,7 @@ const Player = () => {
             {
               search ? (
                 <>
-                  <div className="w-[90%] h-[70%] bg-[#121212] overflow-scroll overflow-y-auto">
+                  <div className="w-[90%] h-[90%] bg-[#121212] overflow-scroll overflow-y-auto mt-9 ">
                     {videos ? (
                       videos.map((item, index) => {
                         return (
@@ -248,10 +248,10 @@ const Player = () => {
                     )
                     }
                   </div>
-                  <div className="w-full flex justify-center items-end">
+                  <div className="w-full flex justify-center items-end mt-10">
                     <form
                       onSubmit={handleSearch}
-                      className="w-full flex justify-center items-center gap-2 mb-5"
+                      className="w-full flex justify-center items-center gap-2 mb-4"
                     >
                       <input
                         type="text"
@@ -296,28 +296,11 @@ const Player = () => {
                        <div ref={lastMessageRef}></div>
                     </div>
                     
-                    <div className="w-full flex justify-center items-end space-x-5 p-4 flex-wrap">
-  <input
-    ref={messageRef}
-    className="pl-8 pr-8 pt-4 pb-4 rounded-xl bg-[#252323] text-white w-full sm:w-[70%] md:w-[80%] lg:w-[60%] xl:w-[50%] max-w-[400px]"
-    type="text"
-    placeholder="Type a Message"
-    onKeyDown={(e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();  // Prevent the default action (like form submission)
-        sendMessage();       // Call your sendMessage function
-      }
-    }}
-  />
-  <SendHorizontal
-    size={45}
-    fill="white"
-    color="green"
-    className="mt-2 sm:mt-0 sm:ml-4"
-    onClick={sendMessage}
-  />
-</div>
-
+                    <div className="w-full flex justify-items-center space-x-5 p-2">
+                   <div className="w-full flex justify-center items-center space-x-2">   <input ref={messageRef} className="w-[70%] h-[50px] rounded-xl bg-[#252323] text-white flex justify-center items-center" type="text" name="" id="" placeholder="Type a Message" onKeyPress={(e)=>e.key=='Enter'?sendMessage():null} />
+                      <div className="w-[10%] flex justify-center items-center"><SendHorizontal size={45} fill="white" color="green" onClick={sendMessage} /></div>
+                    </div> 
+                    </div>
                   </div>
                 </>
               )
