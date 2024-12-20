@@ -1,22 +1,22 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Navbar from '../components/Navbar';
-import { Link, Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import tuneunitybg from '../assets/tuneunitybg.jpg';
 import { X } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import loading_groic from '../assets/loading_groic.gif';
-import io from 'socket.io-client';
-import { setSocket } from '../join';
 import { setId } from '../store';
+import { nanoid } from 'nanoid';
+import { useNavigate } from 'react-router-dom';
 let socket;
 let id;
 export const Home = () => {
+  const navigate = useNavigate();
   const [redirect, setRedirect] = useState(false);
   const [downbar1, setDownbar1] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const idref = useRef(null);
-  const backendURL = 'http://localhost:199';
   const userData = JSON.parse(localStorage.getItem('userdata'));
 
   const notify = (message, icon = "😊") =>
@@ -35,23 +35,12 @@ export const Home = () => {
       alert("Please enter a valid room code.");
       return;
     }
-    setId(id);
-    socket=io(backendURL);
-    setSocket(socket);
-    socket.emit('join', { name: userData.name, room }, (error) => {
-      if (error) {
-        alert(error);
-        console.error('Join Error:', error);
-      } else {
-        setRedirect(true);
-        console.log('Successfully joined the room.');
-      }
-    });
-    socket.on('toastmessage', (msg) => {
-      toast.success(`${msg.text}`, { duration: 3000, icon: "😉" });
-      
-      setRedirect(true);
-    });
+    setId(room);
+    navigate('/player', { state: { propValue: room } });
+  }
+  const handleCreate=()=>{
+       id=nanoid(5).toString();
+       navigate('/player', { state: { propValue: id } });
   }
 
   useEffect(() => {
@@ -62,10 +51,10 @@ export const Home = () => {
     }, 3000);
   }, []);
 
-  if (redirect) {
-    return <Navigate to="/player" />;
+  if(redirect) 
+  {
+     return <Navigate to="/player" state={{ id }} />;
   }
-
   return (
     <>
       <Toaster />
@@ -78,12 +67,12 @@ export const Home = () => {
           <Navbar />
           <div className="w-screen h-screen bg-black flex flex-col">
             <div className="w-screen flex space-x-5 justify-center h-28">
-              <Link
-                to="/player"
+              <div
+                 onClick={handleCreate}
                 className="font-semibold bg-white text-black w-[45%] h-14 rounded-sm flex justify-center items-center"
               >
                 New Room
-              </Link>
+              </div>
               <div
                 className="font-semibold text-white border border-white w-[45%] h-14 rounded-sm flex justify-center items-center"
                 onClick={handleDownBar1}

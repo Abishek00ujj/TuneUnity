@@ -9,12 +9,13 @@ import io from 'socket.io-client'
 import MyText from './MyText'
 import HerText from "./HerText";
 import AdminText from "./AdminText";
-import { nanoid } from 'nanoid';
-import { getId } from "../store";
-import{getSocket} from '../join'
+import { useLocation } from 'react-router-dom';
 let socket;
-let id;
 const Player = () => {
+  const location = useLocation();
+  const { propValue } = location.state || {};
+  console.log(propValue);
+  const lastMessageRef = useRef(null);
   const data = localStorage.getItem('userdata');
   const userData = JSON.parse(data);
   console.log(userData.name);
@@ -109,20 +110,11 @@ const Player = () => {
     }
   };
   
-   const backendURL='http://localhost:199';
+   const backendURL='https://tuneunity-1.onrender.com';
    useEffect(() => {
     toast.success("Public room created");
-    if(getId())
-    {
-      id=getId();
-      socket=getSocket();
-    }
-    else
-    {
       socket=io(backendURL);
-      id = nanoid(5);
-    }
-    socket.emit('join',{name:userData.name,room:id},(error)=>{
+    socket.emit('join',{name:userData.name,room:propValue},(error)=>{
          if(error)
          {
            alert(error);
@@ -155,6 +147,11 @@ const Player = () => {
       console.log(chats);
   },[]);
   console.log(chats);
+  useEffect(() => {
+    if (lastMessageRef.current) {
+      lastMessageRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+  }, [chats]);
   return (
     <>
       <Toaster />
@@ -164,7 +161,7 @@ const Player = () => {
         </div>
       ) : (
         <>
-          <PlayerNavbar id={id}/>
+          <PlayerNavbar id={propValue}/>
           <div className="w-screen h-auto flex flex-col gap-5 bg-black p-5 space-y-10">
             {loading ? (
               <div className="w-screen h-screen bg-black flex justify-center items-center">
@@ -296,11 +293,31 @@ const Player = () => {
                            }
                         }))
                       }
+                       <div ref={lastMessageRef}></div>
                     </div>
-                    <div className="w-full flex justify-center items-end space-x-5 p-4">
-                      <input ref={messageRef} className="pl-8 pr-8 pt-4 pb-4 rounded-xl bg-[#252323] text-white" type="text" name="" id="" placeholder="Type a Message" onKeyPress={(e)=>e.key=='Enter'?sendMessage():null} />
-                      <SendHorizontal size={45} fill="white" color="green" onClick={sendMessage} />
-                    </div>
+                    
+                    <div className="w-full flex justify-center items-end space-x-5 p-4 flex-wrap">
+  <input
+    ref={messageRef}
+    className="pl-8 pr-8 pt-4 pb-4 rounded-xl bg-[#252323] text-white w-full sm:w-[70%] md:w-[80%] lg:w-[60%] xl:w-[50%] max-w-[400px]"
+    type="text"
+    placeholder="Type a Message"
+    onKeyDown={(e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();  // Prevent the default action (like form submission)
+        sendMessage();       // Call your sendMessage function
+      }
+    }}
+  />
+  <SendHorizontal
+    size={45}
+    fill="white"
+    color="green"
+    className="mt-2 sm:mt-0 sm:ml-4"
+    onClick={sendMessage}
+  />
+</div>
+
                   </div>
                 </>
               )
