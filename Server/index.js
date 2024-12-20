@@ -9,8 +9,15 @@ const app=express();
 app.use(cors());
 app.use(express.json());
 const server=http.createServer(app);
-const io=socketio(server,{ cors:{ origin:"*" }});
-
+// const io=socketio(server,{ cors:{ origin:"*" }});
+const io = socketio(server, {
+    cors: {
+        origin: "*",  // Allow all origins (you can restrict this to specific domains if needed)
+        methods: ["GET", "POST"],
+        allowedHeaders: ["my-custom-header"],
+        credentials: true
+    }
+});
 
 io.on('connect',(socket)=>{
     console.log("User connected!");

@@ -6,16 +6,17 @@ import { X } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import loading_groic from '../assets/loading_groic.gif';
 import io from 'socket.io-client';
-
+import { setSocket } from '../join';
+import { setId } from '../store';
 let socket;
-
+let id;
 export const Home = () => {
   const [redirect, setRedirect] = useState(false);
   const [downbar1, setDownbar1] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const idref = useRef(null);
-  const backendURL = 'https://tuneunity-1.onrender.com';
+  const backendURL = 'http://localhost:199';
   const userData = JSON.parse(localStorage.getItem('userdata'));
 
   const notify = (message, icon = "😊") =>
@@ -34,7 +35,9 @@ export const Home = () => {
       alert("Please enter a valid room code.");
       return;
     }
-
+    setId(id);
+    socket=io(backendURL);
+    setSocket(socket);
     socket.emit('join', { name: userData.name, room }, (error) => {
       if (error) {
         alert(error);
@@ -44,16 +47,12 @@ export const Home = () => {
         console.log('Successfully joined the room.');
       }
     });
-  };
-
-  // useEffect(() => {
-  //   socket = io(backendURL);
-
-  //   socket.on('toastmessage', (msg) => {
-  //     toast.success(`${msg.text}`, { duration: 3000, icon: "😉" });
-  //     setRedirect(true);
-  //   });
-  // }, [backendURL]);
+    socket.on('toastmessage', (msg) => {
+      toast.success(`${msg.text}`, { duration: 3000, icon: "😉" });
+      
+      setRedirect(true);
+    });
+  }
 
   useEffect(() => {
     setTimeout(() => {

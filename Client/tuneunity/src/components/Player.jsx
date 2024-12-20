@@ -10,6 +10,8 @@ import MyText from './MyText'
 import HerText from "./HerText";
 import AdminText from "./AdminText";
 import { nanoid } from 'nanoid';
+import { getId } from "../store";
+import{getSocket} from '../join'
 let socket;
 let id;
 const Player = () => {
@@ -107,11 +109,19 @@ const Player = () => {
     }
   };
   
-   const backendURL='https://tuneunity-1.onrender.com';
+   const backendURL='http://localhost:199';
    useEffect(() => {
     toast.success("Public room created");
-    socket=io(backendURL);
-   id = '1234'
+    if(getId())
+    {
+      id=getId();
+      socket=getSocket();
+    }
+    else
+    {
+      socket=io(backendURL);
+      id = nanoid(5);
+    }
     socket.emit('join',{name:userData.name,room:id},(error)=>{
          if(error)
          {
