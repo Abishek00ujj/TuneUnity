@@ -107,7 +107,7 @@ export const Home = () => {
                   placeholder="Enter Code"
                 />
                 <div
-                  className="text-white font-semibold text-lg bg-blue-600 p-2 rounded-md cursor-pointer"
+                  className="text-white font-semibold text-lg bg-green-500 pl-5 pr-5 pt-3 pb-3 p-2 rounded-md cursor-pointer"
                   onClick={handleJoin}
                 >
                   Join

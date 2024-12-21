@@ -13,6 +13,7 @@ import { useLocation } from 'react-router-dom';
 import Information from "./Information";
 let socket;
 let x1;
+let dummy;
 const Player = () => {
   const location = useLocation();
   const { propValue } = location.state || {};
@@ -68,13 +69,13 @@ const Player = () => {
 
     try {
       setError(null);
-      let API_KEYS=["AIzaSyB8nJvHzHnmjhbqTIGMHXntXpE8z_W92JU","AIzaSyAisu-1WVRADxcQbDwllI1hG3ZpTrmkRks","AIzaSyCibkPjuiDQQOGyfXwBe2O9Tg3_ARCLCl0","AIzaSyAaK_9h1f9-wOoHLtwt_bMEnidIo7XuFF8","AIzaSyDAsRtfbLZ_a9cmQSdlDK-PSYrevqP3mos","AIzaSyAoDoUYCKdDCxIYfkwnRw1qVv_gHBdGpps","AIzaSyAmovDF6qD6uLsoyseJ0FP5GZ_GcbkhLoQ","AIzaSyAAgl_-XtI-Rm3_qt9tC5nJxKXKo8Vm05","AIzaSyCQ0TCU1Chq47Mi4bluXXj73I-nYu3Lxcc","AIzaSyBgcan488friWiEwjpNOKQaDfi1m4ahME8"];
+      let API_KEYS=["AIzaSyD6qAtIRV4stj27ziUHN8LeKTYdBPrJzZ0","AIzaSyDHjHJPKXM0tJFVCN1j0wH_cFGyprgcpwc","AIzaSyB-4iNzGs-5_qnJzasVJ2TYIvkI-GFLHRE","AIzaSyBQ2doMsFwD6TitN_VWIH7cEhtc_RkR-wo","AIzaSyD1IpLzlnCsLfo4sSMp-p9Okq7qzfPGOi8","AIzaSyCw-58Wv7HBwUSFeAKCMvylVG3EDdR3ZPQ","AIzaSyCbyQI2rLDhj_rO4p6j0l9QAtlkUwy9nuA","AIzaSyA0RfAKJPYipj75a6oIQ0tmFWs6i20tUDg","AIzaSyCamXR2_AWwutLAx16Wha2jcP7DnSdg1i4","AIzaSyBO944zaSSKHiNkiGNO5xOP5GoBDwK3f7I"];
       const response = await axios.get(
         `https://www.googleapis.com/youtube/v3/search`,
         {
           params: {
             part: "snippet",
-            maxResults: 20,
+            maxResults: 1,
             q: searchQuery||chatSong,
             type: "video",
             key: API_KEYS[Math.floor(Math.random() * 10)],
@@ -90,7 +91,7 @@ const Player = () => {
       sendSongId(videos[currentVideoIndex]?.id?.videoId);
       console.log(videos[currentVideoIndex]?.id?.videoId);
     } catch (err) {
-      setError(err.response?.data?.error?.message || "An error occurred while fetching videos.");
+      setError(err.response?.data?.error?.message || "");
       console.error("Error fetching data from YouTube API:", err);
     } finally {
       setLoading(false);
@@ -115,11 +116,11 @@ const Player = () => {
     }
   };
 
-  const sendSongId=(x)=>{
-    socket.emit('sendSongId', x, (response) => {
-      console.log(response.status);
-  });
-  }
+  // const sendSongId=(x)=>{
+  //   socket.emit('sendSongId', x, (response) => {
+  //     console.log(response.status);
+  // });
+  // }
    const backendURL='https://tuneunity-1.onrender.com';
   // const backendURL='http://localhost:199';
    useEffect(() => {
@@ -135,10 +136,10 @@ const Player = () => {
     // socket.emit('sendSongId', exampleSongId, (response) => {
     //     console.log(response.status);
     // });
-    socket.on('song', (data) => {
-        console.log(`Song ID received from ${data.user}: ${data.songId}`);
-        SetchatSong(data.songId);
-    });
+    // socket.on('song', (data) => {
+    //     console.log(`Song ID received from ${data.user}: ${data.songId}`);
+    //     SetchatSong(data.songId);
+    // });
     setLoading(false);
     setTimeout(() => {
       toast.success(`${userData.name} joined the room`, { duration: 3000, icon: "😉" });
@@ -149,17 +150,17 @@ const Player = () => {
       socket.off();
     }
   }, []);
-  useEffect(() => {
-    if (chatSong) {
-        const videoIndex = videos.findIndex((video) => video.id.videoId === chatSong);
-        if (videoIndex !== -1) {
-            setCurrentVideoIndex(videoIndex);
-            sendSongId(videos[videoIndex]?.id?.videoId); 
-        } else {
-            handleSearch();
-        }
-    }
-}, [chatSong]);
+//   useEffect(() => {
+//     if (chatSong) {
+//         const videoIndex = videos.findIndex((video) => video.id.videoId === chatSong);
+//         if (videoIndex !== -1) {
+//             setCurrentVideoIndex(videoIndex);
+//             sendSongId(videos[videoIndex]?.id?.videoId); 
+//         } else {
+//             handleSearch();
+//         }
+//     }
+// }, [chatSong]);
 
   const sendMessage=(e)=>{
     e.preventDefault();
@@ -176,14 +177,22 @@ const Player = () => {
       socket.on('message',msg=>{
         setChats((prevMessages) => [...prevMessages, msg]);
       });
-      console.log(chats);
+      // console.log(chats);
   },[]);
-  console.log(chats);
+  // console.log(chats);
   useEffect(() => {
     if (chats.length > 0 && chats[chats.length - 1].text.charAt(0) === '!') {
       let x = chats[chats.length - 1].text.slice(1);
+      if(x==dummy)
+      {
+        return;
+      }
+      else
+      {
       console.log(x);
       SetchatSong(x);
+      dummy=x;
+      }
     }
   }, [chats]);
   useEffect(() => {
@@ -287,6 +296,26 @@ const Player = () => {
                     )
                     }
                   </div>
+                  <div className='w-full flex flex-col justify-center items-center'>
+     <div className='w-[80%] flex flex-col justify-start bg-[#252323] p-3 rounded-lg mt-3'>
+        <div className='w-full flex justify-start'>
+            <p className='font-semibold text-white'>Head to Chat section↗️</p>
+        </div>
+        <div>
+            <p className='font-semibold text-white'>
+                Type !songname in chat to play the song to room.
+            </p>
+        </div>
+        <div className='w-full flex justify-between'>
+            <p className='font-semibold text-white'>
+                eg. !minnale
+            </p>
+            <p className='text-green-400 font-bold'>
+                @SyncTogether❤️
+            </p>
+        </div>
+     </div>
+     </div>
                   <div className="w-full flex justify-center items-end mt-10">
                     <form
                       onSubmit={handleSearch}
@@ -298,10 +327,12 @@ const Player = () => {
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search for a video..."
                         className="w-1/2 p-2 text-black rounded-lg"
+                        disabled
                       />
                       <button
                         type="submit"
                         className="bg-green-500 text-white px-4 py-2 rounded-lg"
+                        disabled
                       >
                         Search
                       </button>
