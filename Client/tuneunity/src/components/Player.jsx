@@ -10,7 +10,9 @@ import MyText from './MyText'
 import HerText from "./HerText";
 import AdminText from "./AdminText";
 import { useLocation } from 'react-router-dom';
+import Information from "./Information";
 let socket;
+let x1;
 const Player = () => {
   const location = useLocation();
   const { propValue } = location.state || {};
@@ -66,6 +68,7 @@ const Player = () => {
 
     try {
       setError(null);
+      let API_KEYS=["AIzaSyB8nJvHzHnmjhbqTIGMHXntXpE8z_W92JU","AIzaSyAisu-1WVRADxcQbDwllI1hG3ZpTrmkRks","AIzaSyCibkPjuiDQQOGyfXwBe2O9Tg3_ARCLCl0","AIzaSyAaK_9h1f9-wOoHLtwt_bMEnidIo7XuFF8","AIzaSyDAsRtfbLZ_a9cmQSdlDK-PSYrevqP3mos","AIzaSyAoDoUYCKdDCxIYfkwnRw1qVv_gHBdGpps","AIzaSyAmovDF6qD6uLsoyseJ0FP5GZ_GcbkhLoQ","AIzaSyAAgl_-XtI-Rm3_qt9tC5nJxKXKo8Vm05","AIzaSyCQ0TCU1Chq47Mi4bluXXj73I-nYu3Lxcc","AIzaSyBgcan488friWiEwjpNOKQaDfi1m4ahME8"];
       const response = await axios.get(
         `https://www.googleapis.com/youtube/v3/search`,
         {
@@ -74,17 +77,18 @@ const Player = () => {
             maxResults: 20,
             q: searchQuery||chatSong,
             type: "video",
-            key: "AIzaSyCHKWtaE-RW-B5-13ZhH1pUkGYwWLYdOXY",
+            key: API_KEYS[Math.floor(Math.random() * 10)],
           },
         }
       );
-
       const fetchedVideos = response.data.items;
       if (!fetchedVideos || fetchedVideos.length === 0) {
         throw new Error("No videos found for the given search query.");
       }
       setVideos(fetchedVideos);
       setCurrentVideoIndex(0);
+      sendSongId(videos[currentVideoIndex]?.id?.videoId);
+      console.log(videos[currentVideoIndex]?.id?.videoId);
     } catch (err) {
       setError(err.response?.data?.error?.message || "An error occurred while fetching videos.");
       console.error("Error fetching data from YouTube API:", err);
@@ -110,8 +114,14 @@ const Player = () => {
       toast("This is First video bro!", { icon: "🎉" });
     }
   };
-  
+
+  const sendSongId=(x)=>{
+    socket.emit('sendSongId', x, (response) => {
+      console.log(response.status);
+  });
+  }
    const backendURL='https://tuneunity-1.onrender.com';
+  // const backendURL='http://localhost:199';
    useEffect(() => {
     toast.success("Public room created");
       socket=io(backendURL);
@@ -120,6 +130,14 @@ const Player = () => {
          {
            alert(error);
          }
+    });
+    // const exampleSongId = '12345';
+    // socket.emit('sendSongId', exampleSongId, (response) => {
+    //     console.log(response.status);
+    // });
+    socket.on('song', (data) => {
+        console.log(`Song ID received from ${data.user}: ${data.songId}`);
+        SetchatSong(data.songId);
     });
     setLoading(false);
     setTimeout(() => {
@@ -131,13 +149,26 @@ const Player = () => {
       socket.off();
     }
   }, []);
+  useEffect(() => {
+    if (chatSong) {
+        const videoIndex = videos.findIndex((video) => video.id.videoId === chatSong);
+        if (videoIndex !== -1) {
+            setCurrentVideoIndex(videoIndex);
+            sendSongId(videos[videoIndex]?.id?.videoId); 
+        } else {
+            handleSearch();
+        }
+    }
+}, [chatSong]);
+
   const sendMessage=(e)=>{
     e.preventDefault();
     socket.emit('sendMessage',messageRef.current.value,()=>setmessages(""));
     messageRef.current.value='';
   }
-
+  // let x1;
   useEffect(()=>{
+       x1=0;
       socket.on('toastmessage',msg=>{
         setmessages((prevMessages) => [...prevMessages, msg]);
         toast.success(`${msg.text}`, { duration: 3000, icon: "😉" });
@@ -160,7 +191,6 @@ const Player = () => {
       handleSearch();
     }
   }, [chatSong]);
-
   return (
     <>
       <Toaster />
@@ -288,7 +318,13 @@ const Player = () => {
                   <div className="w-[90%] h-[90%] bg-[#121212] flex flex-col">
                     <div className="w-[100%] h-full flex flex-col overflow-scroll overflow-y-auto">
                       {
+                        // let x1=0;
                         chats&&(chats.map((item,index)=>{
+                          // console.log(index);
+                           if(index==0)
+                           {
+                             return <Information/>
+                           }
                            if(item.user.toLowerCase()==userData.name.toLowerCase())
                            {
                            return <MyText text={item.text} name={item.user}/>;
@@ -297,16 +333,18 @@ const Player = () => {
                            {
                             return <AdminText text={item.text} name={item.user}/>;
                            }
-                           else{
+                           else
+                           {
                             return <HerText text={item.text} name={item.user}/>;
                            }
+                           x1++;
                         }))
                       }
                        <div ref={lastMessageRef}></div>
                     </div>
                     
                     <div className="w-full flex justify-items-center space-x-5 p-2">
-                   <div className="w-full flex justify-center items-center space-x-2">   <input ref={messageRef} className="w-[70%] h-[50px] rounded-xl bg-[#252323] text-white flex justify-center items-center" type="text" name="" id="" placeholder="Type a Message" onKeyPress={(e)=>e.key=='Enter'?sendMessage():null} />
+                   <div className="w-full flex justify-center items-center space-x-2">   <input ref={messageRef} className="w-[70%] h-[50px] rounded-xl bg-[#252323] text-white flex justify-center items-center p-2" type="text" name="" id="" placeholder="Type a Message" onKeyPress={(e)=>e.key=='Enter'?sendMessage():null} />
                       <div className="w-[10%] flex justify-center items-center"><SendHorizontal size={45} fill="white" color="green" onClick={sendMessage} /></div>
                     </div> 
                     </div>

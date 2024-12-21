@@ -12,7 +12,7 @@ const server=http.createServer(app);
 // const io=socketio(server,{ cors:{ origin:"*" }});
 const io = socketio(server, {
     cors: {
-        origin: "*",  // Allow all origins (you can restrict this to specific domains if needed)
+        origin: "*", 
         methods: ["GET", "POST"],
         allowedHeaders: ["my-custom-header"],
         credentials: true
@@ -49,9 +49,17 @@ io.on('connect',(socket)=>{
         else{
             callback("User not found");
         }
-    })
-
-
+    });
+    socket.on('sendSongId', (songId, callback) => {
+        const user = getUser(socket.id);
+        if (user) {
+            io.to(user.room).emit('song', { user: user.name, songId });
+            callback({ status: 'Song ID broadcasted successfully' });
+        } else {
+            callback({ status: 'User not found' });
+        }
+    });
+    
      socket.on('disconnect',()=>{
     console.log("User disconnected!");
     const user=removeUser(socket.id);
