@@ -15,6 +15,17 @@ let socket;
 let x1;
 let dummy;
 const Player = () => {
+  function getFormattedTime() {
+    const now = new Date();
+    let hours = now.getHours();
+    let minutes = now.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; 
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+  
+    return `${hours}:${minutes} ${ampm}`;
+  }
   const location = useLocation();
   const { propValue } = location.state || {};
   console.log(propValue);
@@ -115,12 +126,6 @@ const Player = () => {
       toast("This is First video bro!", { icon: "🎉" });
     }
   };
-
-  // const sendSongId=(x)=>{
-  //   socket.emit('sendSongId', x, (response) => {
-  //     console.log(response.status);
-  // });
-  // }
    const backendURL='https://tuneunity-1.onrender.com';
   // const backendURL='http://localhost:199';
    useEffect(() => {
@@ -132,14 +137,6 @@ const Player = () => {
            alert(error);
          }
     });
-    // const exampleSongId = '12345';
-    // socket.emit('sendSongId', exampleSongId, (response) => {
-    //     console.log(response.status);
-    // });
-    // socket.on('song', (data) => {
-    //     console.log(`Song ID received from ${data.user}: ${data.songId}`);
-    //     SetchatSong(data.songId);
-    // });
     setLoading(false);
     setTimeout(() => {
       toast.success(`${userData.name} joined the room`, { duration: 3000, icon: "😉" });
@@ -150,18 +147,6 @@ const Player = () => {
       socket.off();
     }
   }, []);
-//   useEffect(() => {
-//     if (chatSong) {
-//         const videoIndex = videos.findIndex((video) => video.id.videoId === chatSong);
-//         if (videoIndex !== -1) {
-//             setCurrentVideoIndex(videoIndex);
-//             sendSongId(videos[videoIndex]?.id?.videoId); 
-//         } else {
-//             handleSearch();
-//         }
-//     }
-// }, [chatSong]);
-
   const sendMessage=(e)=>{
     e.preventDefault();
     socket.emit('sendMessage',messageRef.current.value,()=>setmessages(""));
@@ -200,6 +185,11 @@ const Player = () => {
       handleSearch();
     }
   }, [chatSong]);
+  useEffect(() => {
+    if (lastMessageRef.current) {
+      lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [chats]);  
   return (
     <>
       <Toaster />
@@ -358,7 +348,7 @@ const Player = () => {
                            }
                            if(item.user.toLowerCase()==userData.name.toLowerCase())
                            {
-                           return <MyText text={item.text} name={item.user}/>;
+                           return <MyText text={item.text} name={item.user} time={getFormattedTime()}/>;
                            }
                            else if(item.user.toLowerCase()=='admin')
                            {
@@ -366,7 +356,7 @@ const Player = () => {
                            }
                            else
                            {
-                            return <HerText text={item.text} name={item.user}/>;
+                            return <HerText text={item.text} name={item.user} time={getFormattedTime()}/>;
                            }
                            x1++;
                         }))
