@@ -348,7 +348,7 @@ const Player = () => {
                         chats&&(chats.map((item,index)=>{
                            if(index==0)
                            {
-                             return <Information/>
+                              return <Information/>
                            }
                            if(item.user.toLowerCase()==userData.name.toLowerCase())
                            {
