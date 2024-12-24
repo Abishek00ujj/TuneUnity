@@ -11,6 +11,7 @@ import HerText from "./HerText";
 import AdminText from "./AdminText";
 import { useLocation } from 'react-router-dom';
 import Information from "./Information";
+import {SongDesign} from '../components/SongDesign'
 let socket;
 let x1;
 let dummy;
@@ -149,6 +150,10 @@ const Player = () => {
   }, []);
   const sendMessage=(e)=>{
     e.preventDefault();
+    if(messageRef.current.value==null)
+    {
+      return;
+    }
     socket.emit('sendMessage',messageRef.current.value,()=>setmessages(""));
     messageRef.current.value='';
   }
@@ -341,14 +346,20 @@ const Player = () => {
                       {
                         // let x1=0;
                         chats&&(chats.map((item,index)=>{
-                          // console.log(index);
                            if(index==0)
                            {
                              return <Information/>
                            }
                            if(item.user.toLowerCase()==userData.name.toLowerCase())
                            {
-                           return <MyText text={item.text} name={item.user} time={getFormattedTime()}/>;
+                            if(item.text.charAt(0) === '!')
+                            {
+                              return <MyText text={item.text} name={item.user} time={getFormattedTime()} song={true}/>;
+                            }
+                            else
+                            {
+                              return <MyText text={item.text} name={item.user} time={getFormattedTime()} song={false}/>;
+                            }
                            }
                            else if(item.user.toLowerCase()=='admin')
                            {
@@ -356,7 +367,15 @@ const Player = () => {
                            }
                            else
                            {
-                            return <HerText text={item.text} name={item.user} time={getFormattedTime()}/>;
+                            if(item.text.charAt(0) === '!')
+                              {
+                                return <HerText text={item.text} name={item.user} time={getFormattedTime()} song={true}/>;
+                              }
+                              else
+                              {
+                                return <HerText text={item.text} name={item.user} time={getFormattedTime()} song={false}/>;
+                              }
+                            // return <HerText text={item.text} name={item.user} time={getFormattedTime()}/>;
                            }
                            x1++;
                         }))
