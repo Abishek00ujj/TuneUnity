@@ -20,7 +20,7 @@ const HerText = (props) => {
             backgroundPosition: 'center',
           }}
           >
-            <div className="w-full flex justify-start text-white font-bold"></div>
+            <div className="w-full flex justify-start text-white font-bold">{props.name}</div>
             <p className="">{props.text}</p>
             <p className="w-full flex justify-end">{props.time}</p>
           </div>
