@@ -5,6 +5,8 @@ import tuneunitybg from '../assets/tuneunitybg.jpg';
 import { X } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import loading_groic from '../assets/loading_groic.gif';
+import cristmas from '../assets/cristmas.png'
+import ball from '../assets/ball.webp'
 import { setId } from '../store';
 import { nanoid } from 'nanoid';
 import { useNavigate } from 'react-router-dom';
@@ -80,8 +82,13 @@ export const Home = () => {
                 Join with code
               </div>
             </div>
+            <div className='w-screen flex justify-between'>
+            <img src={ball} alt="" className='w-[100px] h-[100px]'/>
+            <img src={ball} alt="" className='w-[100px] h-[100px]'/>
+            </div>
             <div className="w-screen h-[500%] flex flex-col space-y-5 justify-center items-center">
-              <img className="w-[300px] h-[300px]" src={tuneunitybg} alt="Tune Unity Background" />
+            <img src={cristmas} alt="" className='w-[100px] h-[100px]'/>
+              <img className="w-[300px] h-[300px] mb-10" src={tuneunitybg} alt="Tune Unity Background" />
               <p className="font-bold text-2xl text-white">Get a Link That You Can Share</p>
               <div className="w-full flex justify-center flex-col items-center">
                 <p className="font-extralight text-white">Tap New Room to get a link that</p>
