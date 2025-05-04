@@ -1,131 +1,202 @@
 import React, { useEffect, useRef, useState } from 'react';
-import Navbar from '../components/Navbar';
-import { Navigate } from 'react-router-dom';
-import tuneunitybg from '../assets/tuneunitybg.jpg';
+import Navbar from '../components/Navbar'; // Assuming Navbar exists
+import { useNavigate } from 'react-router-dom';
+import tuneunitybg from '../assets/tuneunitybg.jpg'; // Make sure path is correct
+import loading_groic from '../assets/loading_groic.gif'; // Make sure path is correct
 import { X } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
-import loading_groic from '../assets/loading_groic.gif';
-import cristmas from '../assets/cristmas.png'
-import ball from '../assets/ball.webp'
-import { setId } from '../store';
 import { nanoid } from 'nanoid';
-import { useNavigate } from 'react-router-dom';
-let socket;
-let id;
+// Removed setId from store, using navigate state instead as originally
+
 export const Home = () => {
-  const navigate = useNavigate();
-  const [redirect, setRedirect] = useState(false);
-  const [downbar1, setDownbar1] = useState(false);
-  const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(true); // Keep loading state
+    const [downbar1, setDownbar1] = useState(false); // Join modal state
 
-  const idref = useRef(null);
-  const userData = JSON.parse(localStorage.getItem('userdata'));
+    const idref = useRef(null);
+    // Consider moving userData retrieval to Player or App context
+    // const userData = JSON.parse(localStorage.getItem('userdata'));
 
-  const notify = (message, icon = "😊") =>
-    toast(message, {
-      position: 'top-center',
-      icon,
-    });
+    const notify = (message, options = {}) =>
+        toast(message, {
+            position: 'top-center',
+            ...options,
+        });
 
-  const handleDownBar1 = () => {
-    setDownbar1(!downbar1);
-  };
+    const handleDownBar1 = () => {
+        setDownbar1(!downbar1);
+    };
 
-  const handleJoin = () => {
-    const room = idref.current.value.trim();
-    if (!room) {
-      alert("Please enter a valid room code.");
-      return;
+    const handleJoin = () => {
+        const room = idref.current?.value?.trim();
+        if (!room) {
+            toast.error("Please enter a valid room code.");
+            return;
+        }
+        // Basic validation - you might want more robust checks
+        if (room.length < 3 || room.length > 10) {
+             toast.error("Room code should be between 3 and 10 characters.");
+             return;
+        }
+        // Pass room code via navigation state
+        navigate(`/player/${room}`, { state: { roomCode: room } });
+    };
+
+    const handleCreate = () => {
+        const newRoomId = nanoid(6); // Generate a 6-char room ID
+        // Pass room code via navigation state
+        navigate(`/player/${newRoomId}`, { state: { roomCode: newRoomId, isCreating: true } });
+    };
+
+     // Get user data - ensure it exists before navigating
+    const ensureUserData = () => {
+        const data = localStorage.getItem('userdata');
+        if (!data) {
+            toast.error("User data not found. Please log in again.", { id: 'userdata-error' });
+            // Redirect to login or handle appropriately
+            // navigate('/login'); // Example redirect
+            return false;
+        }
+         try {
+             const parsedData = JSON.parse(data);
+             if (!parsedData || !parsedData.name) {
+                  toast.error("Invalid user data. Please log in again.", { id: 'userdata-invalid' });
+                   // navigate('/login');
+                  return false;
+             }
+             return parsedData;
+         } catch (e) {
+              toast.error("Error reading user data. Please log in again.", { id: 'userdata-parse-error' });
+              // navigate('/login');
+             return false;
+         }
+    };
+
+    // Add user data check before navigating
+     const checkedHandleJoin = () => {
+         if (ensureUserData()) {
+             handleJoin();
+         }
+     };
+
+     const checkedHandleCreate = () => {
+          if (ensureUserData()) {
+              handleCreate();
+          }
+      };
+
+
+    useEffect(() => {
+        // Keep initial loading and notifications
+        const timer = setTimeout(() => {
+            // Removed beta version notification - adjust as needed
+            notify("🎧 Let's listen together! 🎶", { icon: "❤️" });
+            setLoading(false);
+        }, 1000); // Reduced timeout
+
+        return () => clearTimeout(timer); // Cleanup timer
+    }, []);
+
+    // Show loading indicator until useEffect finishes
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center w-screen h-screen bg-black">
+                <img src={loading_groic} alt="Loading..." className="w-32 h-32" />
+                 <Toaster /> {/* Ensure Toaster is available during loading */}
+            </div>
+        );
     }
-    setId(room);
-    navigate('/player', { state: { propValue: room } });
-  }
-  const handleCreate=()=>{
-       id=nanoid(5).toString();
-       navigate('/player', { state: { propValue: id } });
-  }
 
-  useEffect(() => {
-    setTimeout(() => {
-      notify("You're using the beta version of SyncTogether. Report issues at abishek3834@gmail.com");
-      notify("Hear songs together🫂", "❤️");
-      setLoading(false);
-    }, 3000);
-  }, []);
-
-  if(redirect) 
-  {
-     return <Navigate to="/player" state={{ id }} />;
-  }
-  return (
-    <>
-      <Toaster />
-      {loading ? (
-        <div className="flex items-center justify-center w-screen h-screen bg-black">
-          <img src={loading_groic} alt="Loading..." />
-        </div>
-      ) : (
+    return (
         <>
-          <Navbar />
-          <div className="flex flex-col w-screen h-screen bg-black">
-            <div className="flex justify-center w-screen space-x-5 h-28">
-              <div
-                 onClick={handleCreate}
-                className="font-semibold bg-white text-black w-[45%] h-14 rounded-sm flex justify-center items-center"
-              >
-                New Room
-              </div>
-              <div
-                className="font-semibold text-white border border-white w-[45%] h-14 rounded-sm flex justify-center items-center"
-                onClick={handleDownBar1}
-              >
-                Join with code
-              </div>
-            </div>
-            {/* <div className='flex justify-between w-screen'>
-            <img src={ball} alt="" className='w-[100px] h-[100px]'/>
-            <img src={ball} alt="" className='w-[100px] h-[100px]'/>
-            </div> */}
-            <div className="w-screen h-[500%] flex flex-col space-y-5 justify-center items-center">
-            {/* <img src={cristmas} alt="" className='w-[100px] h-[100px]'/> */}
-              <img className="w-[300px] h-[300px] mb-10" src={tuneunitybg} alt="Tune Unity Background" />
-              <p className="text-2xl font-bold text-white">Get a Link That You Can Share</p>
-              <div className="flex flex-col items-center justify-center w-full">
-                <p className="text-white font-extralight">Tap New Room to get a link that</p>
-                <p className="text-white font-extralight">you can share with people you want to listen to songs with.</p>
-              </div>
-            </div>
-          </div>
-          {downbar1 && (
-            <div className="w-screen h-[50%] bg-[#121212] fixed bottom-0 rounded-xl">
-              <div className="flex items-center justify-between w-full h-16">
-                <div className="ml-5">
-                  <p className="text-2xl font-semibold text-white">Join with Code</p>
+            <Toaster />
+            {/* Assuming Navbar component exists and works */}
+            {/* <Navbar /> */}
+            <div className="flex flex-col w-screen h-screen bg-black text-white">
+                 {/* Simplified Navbar Placeholder */}
+                 <nav className="flex items-center justify-between p-4 bg-gray-900 shadow-md">
+                    <h1 className="text-2xl font-bold text-green-400">SyncTogether</h1>
+                    {/* Add login/user info if needed */}
+                 </nav>
+
+                <div className="flex justify-center w-full px-4 space-x-4 h-20 mt-8 sm:mt-12">
+                    {/* Create Room Button */}
+                    <button
+                        onClick={checkedHandleCreate} // Use checked version
+                        className="font-semibold bg-green-500 text-black w-[45%] max-w-xs h-14 rounded-lg flex justify-center items-center cursor-pointer hover:bg-green-400 transition-all duration-200 ease-in-out shadow-lg transform hover:scale-105"
+                        aria-label="Create a new listening room"
+                    >
+                        New Room
+                    </button>
+                     {/* Join Room Button */}
+                    <button
+                        className="font-semibold text-white border-2 border-green-500 w-[45%] max-w-xs h-14 rounded-lg flex justify-center items-center cursor-pointer hover:bg-green-900 hover:border-green-400 transition-all duration-200 ease-in-out shadow-lg transform hover:scale-105"
+                        onClick={handleDownBar1} // Opens the join modal
+                        aria-label="Join an existing listening room with a code"
+                    >
+                        Join with code
+                    </button>
                 </div>
-                <div className="mr-5" onClick={handleDownBar1}>
-                  <X color="white" />
+
+                {/* Main Content Area */}
+                <div className="flex flex-col items-center justify-center flex-grow w-full px-4 space-y-6 text-center">
+                    <img className="w-48 h-48 sm:w-64 sm:h-64 mb-4 rounded-full shadow-xl border-4 border-gray-700" src={tuneunitybg} alt="SyncTogether logo" />
+                    <p className="text-xl sm:text-2xl font-bold text-white">Get a Link That You Can Share</p>
+                    <div className="flex flex-col items-center justify-center w-full max-w-md">
+                        <p className="text-gray-300 font-light text-sm sm:text-base">
+                            Tap <span className="font-semibold text-green-400">'New Room'</span> to start a listening session.
+                        </p>
+                        <p className="text-gray-300 font-light text-sm sm:text-base">
+                            Share the code or link with friends to listen together in real-time.
+                        </p>
+                    </div>
                 </div>
-              </div>
-              <div className="flex flex-col items-center w-screen mt-5 space-y-5">
-                <input
-                  type="text"
-                  className="w-[70%] p-3 bg-gray-800 text-white rounded-md"
-                  ref={idref}
-                  placeholder="Enter Code"
-                />
-                <div
-                  className="p-2 pt-3 pb-3 pl-5 pr-5 text-lg font-semibold text-white bg-green-500 rounded-md cursor-pointer"
-                  onClick={handleJoin}
-                >
-                  Join
-                </div>
-              </div>
             </div>
-          )}
+
+             {/* Join with Code Modal (Downbar) */}
+            {downbar1 && (
+                // Added overlay for better focus
+                 <div className="fixed inset-0 z-40 bg-black bg-opacity-70 flex items-end justify-center" onClick={handleDownBar1}>
+                    <div
+                        className="w-full max-w-md h-auto bg-[#1f1f1f] fixed bottom-0 rounded-t-2xl shadow-2xl p-5 transform transition-transform duration-300 ease-out"
+                         style={{ transform: downbar1 ? 'translateY(0)' : 'translateY(100%)' }}
+                         onClick={(e) => e.stopPropagation()} // Prevent closing modal when clicking inside
+                         >
+                        <div className="flex items-center justify-between w-full pb-4 border-b border-gray-700">
+                            <p className="text-xl font-semibold text-white">Join with Code</p>
+                            <button
+                                className="p-2 text-gray-400 rounded-full hover:bg-gray-700 hover:text-white transition-colors"
+                                onClick={handleDownBar1}
+                                aria-label="Close join modal"
+                            >
+                                <X size={24} />
+                            </button>
+                        </div>
+                        <div className="flex flex-col items-center w-full py-6 space-y-5">
+                            <label htmlFor="roomCodeInput" className="sr-only">Enter Room Code</label>
+                            <input
+                                id="roomCodeInput"
+                                type="text"
+                                className="w-[80%] sm:w-[70%] p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 placeholder-gray-500 text-center"
+                                ref={idref}
+                                placeholder="Enter Code"
+                                // Use checked version on Enter key press
+                                onKeyPress={(e) => e.key === 'Enter' ? checkedHandleJoin() : null}
+                                autoFocus // Focus input when modal opens
+                            />
+                            <button
+                                className="p-3 px-10 text-lg font-semibold text-black bg-green-500 rounded-lg cursor-pointer hover:bg-green-400 transition-colors shadow-md transform hover:scale-105"
+                                onClick={checkedHandleJoin} // Use checked version
+                            >
+                                Join Room
+                            </button>
+                        </div>
+                    </div>
+                 </div>
+            )}
         </>
-      )}
-    </>
-  );
+    );
 };
 
-export default Home;
+// Make sure to export default if this is the main export for the file route
+export default Home; // Uncomment if needed by your router setup

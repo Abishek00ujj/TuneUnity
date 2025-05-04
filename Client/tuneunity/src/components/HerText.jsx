@@ -1,41 +1,15 @@
-import React, { useState } from 'react';
-import Chatbg from '../assets/chatbg.png';
+import React from 'react';
 
-const HerText = (props) => {
-  const [glow,setglow]=useState(true);
-  setInterval(()=>{
-    setglow(!glow);
-  },5000);
-  return (
-    <>
-      {props.song ? (
-        <div
-          className="w-full h-auto flex text-white flex-col items-start font-bold"
-        >
-          <div className={glow?(`w-[60%] pl-3 pr-3 pt-2 pb-2 m-2 rounded-2xl bg-black shadow-[0_0_20px_5px_rgba(255,255,0,0.8)]`):(`w-[60%] pl-3 pr-3 pt-2 pb-2 m-2 rounded-2xl bg-black`)}
-           style={{
-            backgroundImage: `url(${Chatbg})`,
-            backgroundSize: 'cover',
-            backgroundRepeat: 'no-repeat',
-            backgroundPosition: 'center',
-          }}
-          >
-            <div className="w-full flex justify-start text-white font-bold">{props.name}</div>
-            <p className="">{props.text}</p>
-            <p className="w-full flex justify-end">{props.time}</p>
-          </div>
-        </div> 
-      ) : (
-        <div className="w-full h-auto flex text-white flex-col items-start">
-          <div className="w-[60%] bg-[#252323] pl-3 pr-3 pt-2 pb-2 m-2 rounded-md">
-            <div className="w-full flex justify-start text-white font-bold">{props.name}</div>
-            <p className="">{props.text}</p>
-            <p className="w-full flex justify-end">{props.time}</p>
-          </div>
+const HerText = ({ id, text, name, time }) => {
+    return (
+        <div className="flex justify-start">
+            <div className="bg-gray-700 text-white p-2 rounded-lg rounded-bl-none max-w-[75%] shadow">
+                <p className="text-xs font-semibold text-blue-300 mb-1">{name}</p> {/* Show sender name */}
+                <p className="text-sm break-words">{text}</p>
+                <p className="text-xs text-gray-400 text-right mt-1">{time}</p>
+            </div>
         </div>
-      )}
-    </>
-  );
+    );
 };
 
-export default HerText;
+export default React.memo(HerText); // Memoize for performance
