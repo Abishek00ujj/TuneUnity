@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar'; // Assuming Navbar exists
 import { useNavigate } from 'react-router-dom';
 import tuneunitybg from '../assets/tuneunitybg.jpg'; // Make sure path is correct
 import loading_groic from '../assets/loading_groic.gif'; // Make sure path is correct
-import { X } from 'lucide-react';
+import { X, User, LogOut, ChevronDown } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import { nanoid } from 'nanoid';
 // Removed setId from store, using navigate state instead as originally
@@ -12,10 +12,33 @@ export const Home = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true); // Keep loading state
     const [downbar1, setDownbar1] = useState(false); // Join modal state
-
+    const [showProfileMenu, setShowProfileMenu] = useState(false);
+    const [userData, setUserData] = useState(null);
+    
+    const profileMenuRef = useRef(null);
     const idref = useRef(null);
-    // Consider moving userData retrieval to Player or App context
-    // const userData = JSON.parse(localStorage.getItem('userdata'));
+    
+    useEffect(() => {
+        // Load user data from localStorage
+        try {
+            const data = localStorage.getItem('userdata');
+            if (data) {
+                setUserData(JSON.parse(data));
+            }
+        } catch (error) {
+            console.error("Error loading user data:", error);
+        }
+        
+        // Handle clicks outside of profile menu to close it
+        const handleClickOutside = (event) => {
+            if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+                setShowProfileMenu(false);
+            }
+        };
+        
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     const notify = (message, options = {}) =>
         toast(message, {
@@ -48,7 +71,7 @@ export const Home = () => {
         navigate(`/player/${newRoomId}`, { state: { roomCode: newRoomId, isCreating: true } });
     };
 
-     // Get user data - ensure it exists before navigating
+    // Get user data - ensure it exists before navigating
     const ensureUserData = () => {
         const data = localStorage.getItem('userdata');
         if (!data) {
@@ -57,34 +80,43 @@ export const Home = () => {
             // navigate('/login'); // Example redirect
             return false;
         }
-         try {
-             const parsedData = JSON.parse(data);
-             if (!parsedData || !parsedData.name) {
-                  toast.error("Invalid user data. Please log in again.", { id: 'userdata-invalid' });
-                   // navigate('/login');
-                  return false;
-             }
-             return parsedData;
-         } catch (e) {
-              toast.error("Error reading user data. Please log in again.", { id: 'userdata-parse-error' });
-              // navigate('/login');
-             return false;
-         }
+        try {
+            const parsedData = JSON.parse(data);
+            if (!parsedData || !parsedData.name) {
+                toast.error("Invalid user data. Please log in again.", { id: 'userdata-invalid' });
+                // navigate('/login');
+                return false;
+            }
+            return parsedData;
+        } catch (e) {
+            toast.error("Error reading user data. Please log in again.", { id: 'userdata-parse-error' });
+            // navigate('/login');
+            return false;
+        }
+    };
+
+    // Handle user logout
+    const handleLogout = () => {
+        localStorage.removeItem('userdata');
+        setUserData(null);
+        setShowProfileMenu(false);
+        toast.success("Logged out successfully");
+        // Optionally navigate to login page
+        navigate('/');
     };
 
     // Add user data check before navigating
-     const checkedHandleJoin = () => {
-         if (ensureUserData()) {
-             handleJoin();
-         }
-     };
+    const checkedHandleJoin = () => {
+        if (ensureUserData()) {
+            handleJoin();
+        }
+    };
 
-     const checkedHandleCreate = () => {
-          if (ensureUserData()) {
-              handleCreate();
-          }
-      };
-
+    const checkedHandleCreate = () => {
+        if (ensureUserData()) {
+            handleCreate();
+        }
+    };
 
     useEffect(() => {
         // Keep initial loading and notifications
@@ -102,7 +134,7 @@ export const Home = () => {
         return (
             <div className="flex items-center justify-center w-screen h-screen bg-black">
                 <img src={loading_groic} alt="Loading..." className="w-32 h-32" />
-                 <Toaster /> {/* Ensure Toaster is available during loading */}
+                <Toaster /> {/* Ensure Toaster is available during loading */}
             </div>
         );
     }
@@ -113,11 +145,51 @@ export const Home = () => {
             {/* Assuming Navbar component exists and works */}
             {/* <Navbar /> */}
             <div className="flex flex-col w-screen h-screen bg-black text-white">
-                 {/* Simplified Navbar Placeholder */}
-                 <nav className="flex items-center justify-between p-4 bg-gray-900 shadow-md">
+                {/* Navbar with Profile Button */}
+                <nav className="flex items-center justify-between p-4 bg-gray-900 shadow-md">
                     <h1 className="text-2xl font-bold text-green-400">SyncTogether</h1>
-                    {/* Add login/user info if needed */}
-                 </nav>
+                    
+                    {/* Profile Button with Dropdown */}
+                    <div className="relative" ref={profileMenuRef}>
+                        <button 
+                            onClick={() => setShowProfileMenu(!showProfileMenu)}
+                            className="flex items-center space-x-1 px-3 py-2 rounded-full bg-gray-800 hover:bg-gray-700 transition-colors"
+                            aria-label="Profile options"
+                        >
+                            <User size={18} className="text-gray-300" />
+                            <span className="hidden sm:inline text-sm text-gray-300">
+                                {userData?.name || "Profile"}
+                            </span>
+                            <ChevronDown size={16} className="text-gray-300" />
+                        </button>
+                        
+                        {/* Dropdown Menu */}
+                        {showProfileMenu && (
+                            <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg overflow-hidden z-50">
+                                {userData ? (
+                                    <div className="p-2 border-b border-gray-700">
+                                        <p className="text-sm font-medium text-gray-300 truncate">
+                                            {userData.name}
+                                        </p>
+                                        {userData.email && (
+                                            <p className="text-xs text-gray-400 truncate">
+                                                {userData.email}
+                                            </p>
+                                        )}
+                                    </div>
+                                ) : null}
+                                
+                                <button
+                                    onClick={handleLogout}
+                                    className="flex items-center space-x-2 w-full px-4 py-3 text-sm text-white hover:bg-gray-700 transition-colors"
+                                >
+                                    <LogOut size={16} className="text-red-400" />
+                                    <span>Logout</span>
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </nav>
 
                 <div className="flex justify-center w-full px-4 space-x-4 h-20 mt-8 sm:mt-12">
                     {/* Create Room Button */}
@@ -128,7 +200,7 @@ export const Home = () => {
                     >
                         New Room
                     </button>
-                     {/* Join Room Button */}
+                    {/* Join Room Button */}
                     <button
                         className="font-semibold text-white border-2 border-green-500 w-[45%] max-w-xs h-14 rounded-lg flex justify-center items-center cursor-pointer hover:bg-green-900 hover:border-green-400 transition-all duration-200 ease-in-out shadow-lg transform hover:scale-105"
                         onClick={handleDownBar1} // Opens the join modal
@@ -153,15 +225,15 @@ export const Home = () => {
                 </div>
             </div>
 
-             {/* Join with Code Modal (Downbar) */}
+            {/* Join with Code Modal (Downbar) */}
             {downbar1 && (
                 // Added overlay for better focus
-                 <div className="fixed inset-0 z-40 bg-black bg-opacity-70 flex items-end justify-center" onClick={handleDownBar1}>
+                <div className="fixed inset-0 z-40 bg-black bg-opacity-70 flex items-end justify-center" onClick={handleDownBar1}>
                     <div
                         className="w-full max-w-md h-auto bg-[#1f1f1f] fixed bottom-0 rounded-t-2xl shadow-2xl p-5 transform transition-transform duration-300 ease-out"
-                         style={{ transform: downbar1 ? 'translateY(0)' : 'translateY(100%)' }}
-                         onClick={(e) => e.stopPropagation()} // Prevent closing modal when clicking inside
-                         >
+                        style={{ transform: downbar1 ? 'translateY(0)' : 'translateY(100%)' }}
+                        onClick={(e) => e.stopPropagation()} // Prevent closing modal when clicking inside
+                    >
                         <div className="flex items-center justify-between w-full pb-4 border-b border-gray-700">
                             <p className="text-xl font-semibold text-white">Join with Code</p>
                             <button
@@ -192,7 +264,7 @@ export const Home = () => {
                             </button>
                         </div>
                     </div>
-                 </div>
+                </div>
             )}
         </>
     );
