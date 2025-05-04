@@ -399,7 +399,7 @@ export const Player = () => {
                 {
                     params: {
                         part: "snippet",
-                        maxResults: 10, // Get more results
+                        maxResults: 2, // Get more results
                         q: searchTerm,
                         type: "video",
                         key: apiKey,
@@ -700,148 +700,148 @@ export const Player = () => {
               </div>
             </div>
     
-            {/* Right Column: Tabs (Search/Chat/UpNext) */}
-            <div className={`${activeTab !== 'player' ? 'flex' : 'hidden md:flex'} w-full md:w-1/3 lg:w-2/5 flex-col bg-[#121212] overflow-hidden h-full md:h-auto`}>
-              {/* Tab Navigation - Only visible on md+ screens */}
-              <div className="hidden md:flex justify-around items-center bg-gray-800 shadow-md flex-shrink-0">
-                {['search', 'chat', 'upnext'].map(tab => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={`flex-1 py-3 text-center font-semibold text-sm uppercase tracking-wider transition-colors duration-200 ${
-                      activeTab === tab
-                        ? 'text-green-400 border-b-2 border-green-400'
-                        : 'text-gray-400 hover:text-white'
-                    }`}
-                    disabled={tab === 'upnext'} // Disable Up Next for now
-                  >
-                    {tab} {tab === 'upnext' ? '(Soon)' : ''}
-                  </button>
-                ))}
-              </div>
-    
-              {/* Tab Content */}
-              <div className="flex-grow overflow-y-auto p-1"> {/* Added padding */}
-                {/* Search Tab */}
-                {activeTab === 'search' && (
-                  <div className="flex flex-col h-full">
-                    {/* Search Input Form */}
-                    <form onSubmit={handleSearch} className="p-2 sm:p-3 flex items-center space-x-2 sticky top-0 bg-[#121212] z-10 border-b border-gray-700">
-                      <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Search YouTube..."
-                        className="flex-grow p-2 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                      />
-                      <button type="submit" disabled={searchLoading || !searchQuery} className="px-3 py-2 bg-green-600 hover:bg-green-500 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm">
-                        {searchLoading ? "..." : "Search"}
-                      </button>
-                    </form>
-                    {/* Search Status/Error */}
-                    {errorMessage && !searchLoading && <p className="text-red-500 p-2 sm:p-3 text-center">{errorMessage}</p>}
-                    {searchLoading && (
-                      <div className="flex justify-center items-center p-4">
-                        <p>Searching...</p>
-                      </div>
-                    )}
-    
-                    {/* Search Results List */}
-                    <div className="flex-grow overflow-y-auto p-2 space-y-1">
-                      {!searchLoading && searchResults.length === 0 && !errorMessage && (
-                        <p className="text-gray-500 text-center pt-10">Enter a search term to find videos.</p>
-                      )}
-                      {searchResults.map(video => (
-                        <SearchResultItem
-                          key={video.id.videoId}
-                          video={video}
-                          onPlayRequest={handlePlayRequest}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-    
-                {/* Chat Tab */}
-                {activeTab === 'chat' && (
-                  <div className="flex flex-col h-full">
-                    {/* Chat Messages Area */}
-                    <div className="flex-grow overflow-y-auto p-2 sm:p-3 space-y-2 sm:space-y-3">
-                      {chats.map((item, index) => {
-                        // Unique key using message id if available, otherwise index
-                        const key = item.id || `msg-${index}`;
-    
-                        if (item.user?.toLowerCase() === 'admin') {
-                          return <AdminText key={key} id={item.id} text={item.text} />;
-                        } else if (item.user?.toLowerCase() === userData?.name?.toLowerCase()) {
-                          return (
-                            <MyText
-                              key={key}
-                              id={item.id}
-                              text={item.text}
-                              name={item.user}
-                              time={getFormattedTime()} // Consider storing server timestamp
-                              showDelete={true} // Show delete for own messages
-                              onDelete={() => handleDeleteMessage(item.id)}
-                            />
-                          );
-                        } else {
-                          return (
-                            <HerText
-                              key={key}
-                              id={item.id}
-                              text={item.text}
-                              name={item.user}
-                              time={getFormattedTime()}
-                            />
-                          );
-                        }
-                      })}
-                      <div ref={lastMessageRef} /> {/* Anchor for scrolling */}
-                    </div>
-    
-                    {/* Typing Indicator */}
-                    <div className="h-5 px-2 sm:px-3 text-xs text-gray-400 italic flex-shrink-0">
-                      {typingUsers.length > 0 && (
-                        <span>
-                          {typingUsers.join(', ')} {typingUsers.length === 1 ? 'is' : 'are'} typing...
-                        </span>
-                      )}
-                    </div>
-    
-                    {/* Chat Input Area */}
-                    <form onSubmit={handleSendMessage} className="p-2 sm:p-3 flex items-center space-x-2 border-t border-gray-700 flex-shrink-0">
-                      <input
-                        type="text"
-                        value={messageInput}
-                        onChange={handleTyping} // Use the debounced handler
-                        placeholder="Type a message..."
-                        className="flex-grow p-2 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-1 focus:ring-green-500"
-                        maxLength={200} // Add max length
-                      />
-                      <button type="submit" disabled={!messageInput || !isConnected} className="p-2 bg-green-600 hover:bg-green-500 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">
-                        <SendHorizontal size={20} />
-                      </button>
-                    </form>
-                  </div>
-                )}
-    
-                {/* Up Next Tab (Placeholder) */}
-                {activeTab === 'upnext' && (
-                  <div className="p-4 text-gray-500 text-center">
-                    <p>Up Next / Queue feature coming soon!</p>
-                    <p className="text-sm">(This would show the upcoming songs)</p>
-                  </div>
-                )}
-              </div> {/* End Tab Content */}
-            </div> {/* End Right Column */}
-          </div> {/* End Main Content Area */}
-        </div> {/* End Full Page Wrapper */}
-    
-        {/* User List Modal */}
-        {showUserList && <UserListPopup users={usersInRoom} onClose={() => setShowUserList(false)} />}
-      </>
-    );
+         {/* Right Column: Tabs (Search/Chat/UpNext) */}
+<div className={`${activeTab !== 'player' ? 'flex' : 'hidden md:flex'} w-full md:w-1/3 lg:w-2/5 flex-col bg-[#121212] overflow-hidden h-full`}>
+  {/* Tab Navigation - Only visible on md+ screens */}
+  <div className="hidden md:flex justify-around items-center bg-gray-800 shadow-md flex-shrink-0">
+    {['search', 'chat', 'upnext'].map(tab => (
+      <button
+        key={tab}
+        onClick={() => setActiveTab(tab)}
+        className={`flex-1 py-3 text-center font-semibold text-sm uppercase tracking-wider transition-colors duration-200 ${
+          activeTab === tab
+            ? 'text-green-400 border-b-2 border-green-400'
+            : 'text-gray-400 hover:text-white'
+        }`}
+        disabled={tab === 'upnext'} // Disable Up Next for now
+      >
+        {tab} {tab === 'upnext' ? '(Soon)' : ''}
+      </button>
+    ))}
+  </div>
+
+  {/* Tab Content */}
+  <div className="flex-grow overflow-y-auto p-1 flex flex-col"> {/* Added flex flex-col */}
+    {/* Search Tab */}
+    {activeTab === 'search' && (
+      <div className="flex flex-col h-full">
+        {/* Search Input Form */}
+        <form onSubmit={handleSearch} className="p-2 sm:p-3 flex items-center space-x-2 sticky top-0 bg-[#121212] z-10 border-b border-gray-700">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search YouTube..."
+            className="flex-grow p-2 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
+          <button type="submit" disabled={searchLoading || !searchQuery} className="px-3 py-2 bg-green-600 hover:bg-green-500 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm">
+            {searchLoading ? "..." : "Search"}
+          </button>
+        </form>
+        {/* Search Status/Error */}
+        {errorMessage && !searchLoading && <p className="text-red-500 p-2 sm:p-3 text-center">{errorMessage}</p>}
+        {searchLoading && (
+          <div className="flex justify-center items-center p-4">
+            <p>Searching...</p>
+          </div>
+        )}
+
+        {/* Search Results List */}
+        <div className="flex-grow overflow-y-auto p-2 space-y-1">
+          {!searchLoading && searchResults.length === 0 && !errorMessage && (
+            <p className="text-gray-500 text-center pt-10">Enter a search term to find videos.</p>
+          )}
+          {searchResults.map(video => (
+            <SearchResultItem
+              key={video.id.videoId}
+              video={video}
+              onPlayRequest={handlePlayRequest}
+            />
+          ))}
+        </div>
+      </div>
+    )}
+
+    {/* Chat Tab */}
+    {activeTab === 'chat' && (
+      <div className="flex flex-col h-full">
+        {/* Chat Messages Area */}
+        <div className="flex-grow overflow-y-auto p-2 sm:p-3 space-y-2 sm:space-y-3">
+          {chats.map((item, index) => {
+            // Unique key using message id if available, otherwise index
+            const key = item.id || `msg-${index}`;
+
+            if (item.user?.toLowerCase() === 'admin') {
+              return <AdminText key={key} id={item.id} text={item.text} />;
+            } else if (item.user?.toLowerCase() === userData?.name?.toLowerCase()) {
+              return (
+                <MyText
+                  key={key}
+                  id={item.id}
+                  text={item.text}
+                  name={item.user}
+                  time={getFormattedTime()} // Consider storing server timestamp
+                  showDelete={true} // Show delete for own messages
+                  onDelete={() => handleDeleteMessage(item.id)}
+                />
+              );
+            } else {
+              return (
+                <HerText
+                  key={key}
+                  id={item.id}
+                  text={item.text}
+                  name={item.user}
+                  time={getFormattedTime()}
+                />
+              );
+            }
+          })}
+          <div ref={lastMessageRef} /> {/* Anchor for scrolling */}
+        </div>
+
+        {/* Typing Indicator */}
+        <div className="h-5 px-2 sm:px-3 text-xs text-gray-400 italic flex-shrink-0">
+          {typingUsers.length > 0 && (
+            <span>
+              {typingUsers.join(', ')} {typingUsers.length === 1 ? 'is' : 'are'} typing...
+            </span>
+          )}
+        </div>
+
+        {/* Chat Input Area - Fixed for mobile */}
+        <form onSubmit={handleSendMessage} className="p-2 sm:p-3 flex items-center space-x-2 border-t border-gray-700 flex-shrink-0 sticky bottom-0 bg-[#121212] w-full">
+          <input
+            type="text"
+            value={messageInput}
+            onChange={handleTyping} // Use the debounced handler
+            placeholder="Type a message..."
+            className="flex-grow p-2 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-1 focus:ring-green-500"
+            maxLength={200} // Add max length
+          />
+          <button type="submit" disabled={!messageInput || !isConnected} className="p-2 bg-green-600 hover:bg-green-500 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">
+            <SendHorizontal size={20} />
+          </button>
+        </form>
+      </div>
+    )}
+
+    {/* Up Next Tab (Placeholder) */}
+    {activeTab === 'upnext' && (
+      <div className="p-4 text-gray-500 text-center">
+        <p>Up Next / Queue feature coming soon!</p>
+        <p className="text-sm">(This would show the upcoming songs)</p>
+      </div>
+    )}
+  </div> {/* End Tab Content */}
+</div> {/* End Right Column */}
+</div> {/* End Main Content Area */}
+</div> {/* End Full Page Wrapper */}
+
+{/* User List Modal */}
+{showUserList && <UserListPopup users={usersInRoom} onClose={() => setShowUserList(false)} />}
+</>
+);
 };
 
 export default Player; // Uncomment if needed by your router setup
