@@ -108,7 +108,7 @@ export const Player = () => {
         height: '390', // Adjust as needed
         width: '100%', // Make responsive
         playerVars: {
-            autoplay: 0, // Controlled programmatically
+            autoplay: 1, // Controlled programmatically
             controls: 0, // Disable native controls for sync
             rel: 0, // Don't show related videos at end
             modestbranding: 1, // Less YouTube branding
