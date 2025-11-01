@@ -1,4 +1,3 @@
-
 const express = require('express');
 const http = require('http');
 const socketio = require("socket.io");
@@ -9,16 +8,16 @@ const {
     getUser,
     getUsersInRoom,
     getRoomState,
-    setRoomSong,
+    setRoomMedia, // Changed from setRoomSong
     setRoomPlayback,
     addTypingUser,
     removeTypingUser,
     getTypingUsersInRoom
 } = require('./entity');
-const { nanoid } = require('nanoid'); // For message IDs
+const { nanoid } = require('nanoid');
 
 const app = express();
-app.use(cors()); // Basic CORS setup
+app.use(cors());
 app.use(express.json());
 
 const server = http.createServer(app);
@@ -31,8 +30,6 @@ const io = socketio(server, {
 });
 
 // Simple in-memory store for chat messages (per room)
-// WARNING: This will be lost on server restart and consume memory.
-// Consider a database for persistence or larger scale.
 const chatHistory = {}; // { room: [ { id, user, text, timestamp }, ... ] }
 
 io.on('connect', (socket) => {
@@ -45,16 +42,15 @@ io.on('connect', (socket) => {
 
         if (error) {
             console.error(`Join error for ${name} in ${room}: ${error}`);
-            if (callback) callback({ error }); // Send error back to client
+            if (callback) callback({ error });
             return;
         }
 
         if (!user) {
-             console.error(`Join error: User object undefined for ${name} in ${room}`);
-             if (callback) callback({ error: "Failed to create user object on server." });
-             return;
+            console.error(`Join error: User object undefined for ${name} in ${room}`);
+            if (callback) callback({ error: "Failed to create user object on server." });
+            return;
         }
-
 
         socket.join(user.room);
         console.log(`${user.name} (${socket.id}) joined room ${user.room}`);
@@ -63,7 +59,6 @@ io.on('connect', (socket) => {
         if (!chatHistory[user.room]) {
             chatHistory[user.room] = [];
         }
-
 
         // Send welcome message to the joining user *only*
         socket.emit('message', { id: nanoid(8), user: 'Admin', text: `Welcome to the room, ${user.name}!` });
@@ -74,9 +69,9 @@ io.on('connect', (socket) => {
         // Notify others in the room
         socket.broadcast.to(user.room).emit('message', { id: nanoid(8), user: 'Admin', text: `${user.name} has joined!` });
 
-        // Send current room state (song, playback) to the joining user
+        // Send current room state (media, playback) to the joining user
         const currentState = getRoomState(user.room);
-        if (currentState && currentState.currentSong) {
+        if (currentState && currentState.currentMedia) {
             socket.emit('roomStateSync', currentState);
             console.log(`Sent room state sync to ${user.name}`, currentState);
         }
@@ -85,8 +80,7 @@ io.on('connect', (socket) => {
         const usersInRoom = getUsersInRoom(user.room).map(u => u.name);
         io.to(user.room).emit('updateUserList', usersInRoom);
 
-        if (callback) callback({ success: true }); // Acknowledge successful join
-
+        if (callback) callback({ success: true });
     });
 
     // --- Send Message ---
@@ -94,7 +88,7 @@ io.on('connect', (socket) => {
         const user = getUser(socket.id);
         if (user && messageText) {
             const message = {
-                id: nanoid(8), // Unique ID for deletion
+                id: nanoid(8),
                 user: user.name,
                 text: messageText,
                 timestamp: Date.now()
@@ -104,7 +98,7 @@ io.on('connect', (socket) => {
                 chatHistory[user.room].push(message);
                 // Optional: Trim history if it gets too long
                 if (chatHistory[user.room].length > 100) {
-                     chatHistory[user.room].shift(); // Remove the oldest message
+                    chatHistory[user.room].shift();
                 }
             }
             // Broadcast message
@@ -112,21 +106,20 @@ io.on('connect', (socket) => {
             console.log(`[Room ${user.room}] Message from ${user.name}: ${messageText}`);
             if (callback) callback({ status: 'Message sent' });
         } else {
-             if (callback) callback({ error: 'User not found or message empty' });
+            if (callback) callback({ error: 'User not found or message empty' });
         }
     });
 
-     // --- Delete Message ---
-     socket.on('deleteMessage', (messageId, callback) => {
+    // --- Delete Message ---
+    socket.on('deleteMessage', (messageId, callback) => {
         const user = getUser(socket.id);
         if (user && messageId) {
             const roomMessages = chatHistory[user.room];
             if (roomMessages) {
                 const messageIndex = roomMessages.findIndex(msg => msg.id === messageId);
-                // Basic authorization: Only allow deletion by the message sender or an 'admin' role (not implemented here)
                 if (messageIndex !== -1 && roomMessages[messageIndex].user === user.name) {
-                    roomMessages.splice(messageIndex, 1); // Remove from history
-                    io.to(user.room).emit('messageDeleted', messageId); // Notify clients
+                    roomMessages.splice(messageIndex, 1);
+                    io.to(user.room).emit('messageDeleted', messageId);
                     console.log(`[Room ${user.room}] Message ${messageId} deleted by ${user.name}`);
                     if (callback) callback({ status: 'Message deleted' });
                 } else {
@@ -135,39 +128,63 @@ io.on('connect', (socket) => {
                 }
             }
         } else {
-             if (callback) callback({ error: 'User not found or message ID missing' });
+            if (callback) callback({ error: 'User not found or message ID missing' });
         }
     });
 
-
-    // --- Playback Control ---
-    // Client requests to play a specific song
-     socket.on('requestPlaySong', ({ videoId, title }, callback) => {
+    // --- Media Control (YouTube, TV, Radio) ---
+    // Client requests to play specific media
+    socket.on('requestPlayMedia', (mediaData, callback) => {
         const user = getUser(socket.id);
-        if (user && videoId && title) {
-            console.log(`[Room ${user.room}] ${user.name} requested song: ${title} (${videoId})`);
-            setRoomSong(user.room, videoId, title);
-            const newState = getRoomState(user.room);
-            io.to(user.room).emit('roomStateSync', newState); // Broadcast new state
-            if (callback) callback({ status: 'Song request processed' });
+        
+        // Validate mediaData structure
+        if (user && mediaData && mediaData.type && mediaData.title) {
+            const validTypes = ['youtube', 'tv', 'radio'];
+            
+            if (!validTypes.includes(mediaData.type)) {
+                if (callback) callback({ error: 'Invalid media type' });
+                return;
+            }
 
-             // Announce the song change in chat
-             const announcement = {
-                 id: nanoid(8),
-                 user: 'Admin',
-                 text: `${user.name} changed the song to: ${title}`,
-                 timestamp: Date.now()
-             };
-             if (chatHistory[user.room]) chatHistory[user.room].push(announcement);
-             io.to(user.room).emit('message', announcement);
+            // Validate required fields based on media type
+            if (mediaData.type === 'youtube' && !mediaData.videoId) {
+                if (callback) callback({ error: 'YouTube media requires videoId' });
+                return;
+            }
+            if ((mediaData.type === 'tv' || mediaData.type === 'radio') && !mediaData.url) {
+                if (callback) callback({ error: 'TV/Radio media requires url' });
+                return;
+            }
+
+            console.log(`[Room ${user.room}] ${user.name} requested ${mediaData.type}: ${mediaData.title}`);
+            
+            setRoomMedia(user.room, mediaData);
+            const newState = getRoomState(user.room);
+            io.to(user.room).emit('roomStateSync', newState);
+            
+            if (callback) callback({ status: 'Media request processed' });
+
+            // Announce the media change in chat
+            let mediaTypeEmoji = '🎵';
+            if (mediaData.type === 'tv') mediaTypeEmoji = '📺';
+            if (mediaData.type === 'radio') mediaTypeEmoji = '📻';
+
+            const announcement = {
+                id: nanoid(8),
+                user: 'Admin',
+                text: `${user.name} changed to ${mediaTypeEmoji} ${mediaData.title}`,
+                timestamp: Date.now()
+            };
+            if (chatHistory[user.room]) chatHistory[user.room].push(announcement);
+            io.to(user.room).emit('message', announcement);
 
         } else {
-            if (callback) callback({ error: 'Invalid request' });
+            if (callback) callback({ error: 'Invalid media request data' });
         }
     });
 
-     // Client reports its playback state change (play/pause/seek)
-    socket.on('playbackAction', ({ isPlaying, currentTime }, callback) => {
+    // Client reports its playback state change (play/pause/seek)
+    socket.on('playbackAction', ({ isPlaying, currentTime, currentMedia }, callback) => {
         const user = getUser(socket.id);
         if (user && typeof isPlaying === 'boolean' && typeof currentTime === 'number') {
             console.log(`[Room ${user.room}] ${user.name} action: ${isPlaying ? 'Play' : 'Pause'} at ${currentTime.toFixed(2)}s`);
@@ -176,12 +193,12 @@ io.on('connect', (socket) => {
             setRoomPlayback(user.room, isPlaying, currentTime);
             const newState = getRoomState(user.room);
 
-             // Broadcast the change *only* (don't need full sync for every pause/play)
-             // Send to others, not back to the sender
+            // Broadcast the change to others
             socket.broadcast.to(user.room).emit('playbackUpdate', {
                 isPlaying: newState.isPlaying,
                 seekTime: newState.lastSeekTime,
-                actionTime: newState.startTime // Timestamp of when the action occurred server-side
+                actionTime: newState.startTime,
+                currentMedia: newState.currentMedia // Include current media info
             });
 
             if (callback) callback({ status: 'Playback action received' });
@@ -196,7 +213,7 @@ io.on('connect', (socket) => {
         if (user) {
             addTypingUser(user.room, user.id, user.name);
             const typingNow = getTypingUsersInRoom(user.room);
-            socket.broadcast.to(user.room).emit('typingUpdate', typingNow); // Update others
+            socket.broadcast.to(user.room).emit('typingUpdate', typingNow);
         }
     });
 
@@ -204,16 +221,15 @@ io.on('connect', (socket) => {
         const user = getUser(socket.id);
         if (user) {
             removeTypingUser(user.room, user.id);
-             const typingNow = getTypingUsersInRoom(user.room);
-            socket.broadcast.to(user.room).emit('typingUpdate', typingNow); // Update others
+            const typingNow = getTypingUsersInRoom(user.room);
+            socket.broadcast.to(user.room).emit('typingUpdate', typingNow);
         }
     });
-
 
     // --- Disconnect ---
     socket.on('disconnect', (reason) => {
         console.log(`User disconnected: ${socket.id}, Reason: ${reason}`);
-        const user = removeUser(socket.id); // removeUser now returns the user object
+        const user = removeUser(socket.id);
         if (user) {
             console.log(`Removed user ${user.name} from room ${user.room}`);
             // Notify others in the room
@@ -223,17 +239,17 @@ io.on('connect', (socket) => {
             const usersInRoom = getUsersInRoom(user.room).map(u => u.name);
             io.to(user.room).emit('updateUserList', usersInRoom);
 
-             // Update typing status
-             removeTypingUser(user.room, user.id); // Ensure they are removed if they disconnect while typing
-             const typingNow = getTypingUsersInRoom(user.room);
-             io.to(user.room).emit('typingUpdate', typingNow);
+            // Update typing status
+            removeTypingUser(user.room, user.id);
+            const typingNow = getTypingUsersInRoom(user.room);
+            io.to(user.room).emit('typingUpdate', typingNow);
         } else {
-             console.log(`Disconnect: Could not find user data for ${socket.id}`);
+            console.log(`Disconnect: Could not find user data for ${socket.id}`);
         }
     });
 });
 
-const PORT = 199; // Use environment variable or default
+const PORT = 199;
 server.listen(PORT, () => {
     console.log(`Server is running on port http://localhost:${PORT}`);
 });

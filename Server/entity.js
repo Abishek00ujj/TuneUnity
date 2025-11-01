@@ -1,6 +1,6 @@
 // entity.js
 let users = []; // { id: socketId, name: string, room: string }
-let roomState = {}; // { room: { currentSong: { videoId, title }, isPlaying: bool, startTime: timestamp, lastSeekTime: number } }
+let roomState = {}; // { room: { currentMedia: { type, videoId/url, title }, isPlaying: bool, startTime: timestamp, lastSeekTime: number } }
 let typingUsers = {}; // { room: { userId: name, ... } }
 
 const addUsers = (id, name, room) => {
@@ -9,13 +9,12 @@ const addUsers = (id, name, room) => {
             return { error: 'Name and room are required!' };
         }
 
-        name = name.trim(); // Keep original case for display? Or lowercase? Let's keep original for display.
+        name = name.trim();
         room = room.trim().toLowerCase();
 
         // Prevent duplicate names *in the same room*
         const existingUserInRoom = users.find(user => user.room === room && user.name.toLowerCase() === name.toLowerCase());
         if (existingUserInRoom) {
-             // You might want to append a number or reject the connection
             return { error: `Username "${name}" is already taken in this room.` };
         }
 
@@ -27,17 +26,16 @@ const addUsers = (id, name, room) => {
         // Initialize room state if it doesn't exist
         if (!roomState[room]) {
             roomState[room] = {
-                currentSong: null, // { videoId, title }
+                currentMedia: null, // { type: 'youtube'|'tv'|'radio', videoId/url, title }
                 isPlaying: false,
-                startTime: null, // Server timestamp when playback started/resumed
-                lastSeekTime: 0 // Last known player time in seconds
+                startTime: null,
+                lastSeekTime: 0
             };
         }
-         // Initialize typing users for the room
-         if (!typingUsers[room]) {
+        // Initialize typing users for the room
+        if (!typingUsers[room]) {
             typingUsers[room] = {};
         }
-
 
         return { user };
     } catch (error) {
@@ -66,9 +64,9 @@ const removeUser = (id) => {
             delete roomState[user.room];
             delete typingUsers[user.room];
         }
-        return user; // Return the removed user object
+        return user;
     }
-    return null; // Indicate user not found
+    return null;
 };
 
 const getUser = (id) => {
@@ -86,28 +84,29 @@ const getRoomState = (room) => {
     return roomState[room.toLowerCase()];
 }
 
-const setRoomSong = (room, videoId, title) => {
+// Updated to handle any media type (YouTube, TV, Radio)
+const setRoomMedia = (room, mediaData) => {
     room = room.toLowerCase();
     if (roomState[room]) {
-        roomState[room].currentSong = { videoId, title };
-        roomState[room].isPlaying = true; // Auto-play new song
+        roomState[room].currentMedia = mediaData; // { type, videoId/url, title }
+        roomState[room].isPlaying = true; // Auto-play new media
         roomState[room].startTime = Date.now();
-        roomState[room].lastSeekTime = 0; // Reset seek time for new song
-        console.log(`[Room ${room}] Set song:`, roomState[room]);
+        roomState[room].lastSeekTime = 0; // Reset seek time for new media
+        console.log(`[Room ${room}] Set media:`, roomState[room]);
     }
 }
 
 const setRoomPlayback = (room, isPlaying, seekTime) => {
-     room = room.toLowerCase();
-     if (roomState[room]) {
+    room = room.toLowerCase();
+    if (roomState[room]) {
         const stateChanged = roomState[room].isPlaying !== isPlaying;
         roomState[room].isPlaying = isPlaying;
         roomState[room].lastSeekTime = seekTime;
-        if (stateChanged) { // Only update startTime if play/pause state *changes*
-             roomState[room].startTime = Date.now();
+        if (stateChanged) {
+            roomState[room].startTime = Date.now();
         }
         console.log(`[Room ${room}] Set playback:`, roomState[room]);
-     }
+    }
 }
 
 // --- Typing Status ---
@@ -129,14 +128,13 @@ const getTypingUsersInRoom = (room) => {
     return typingUsers[room] ? Object.values(typingUsers[room]) : [];
 }
 
-
 module.exports = {
     addUsers,
     removeUser,
     getUser,
     getUsersInRoom,
     getRoomState,
-    setRoomSong,
+    setRoomMedia, // Changed from setRoomSong
     setRoomPlayback,
     addTypingUser,
     removeTypingUser,
