@@ -116,14 +116,14 @@ const GifPicker = ({ onSelect, onClose }) => {
     };
 
     return (
-        <div className="absolute bottom-16 right-0 w-80 h-96 bg-gray-900 border border-gray-700 rounded-lg shadow-2xl z-50 flex flex-col">
-            <div className="p-3 border-b border-gray-700 flex justify-between items-center">
+        <div className="absolute bottom-16 right-0 w-80 h-96 bg-gray-900/95 backdrop-blur-xl border border-gray-700 rounded-lg shadow-2xl z-50 flex flex-col">
+            <div className="p-3 border-b border-gray-700 flex justify-between items-center flex-shrink-0">
                 <h3 className="text-white font-semibold">Choose GIF</h3>
                 <button onClick={onClose} className="text-gray-400 hover:text-white">
                     <X size={18} />
                 </button>
             </div>
-            <form onSubmit={handleSearch} className="p-2 border-b border-gray-700">
+            <form onSubmit={handleSearch} className="p-2 border-b border-gray-700 flex-shrink-0">
                 <input
                     type="text"
                     value={searchQuery}
@@ -156,8 +156,8 @@ const GifPicker = ({ onSelect, onClose }) => {
 // --- Helper Components ---
 
 const UserListPopup = ({ users, onClose }) => (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm" onClick={onClose}>
-        <div className="bg-gradient-to-br from-gray-900 to-black text-white rounded-xl shadow-2xl p-6 max-w-xs w-full mx-4 border border-gray-700" onClick={e => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm" onClick={onClose}>
+        <div className="bg-gradient-to-br from-gray-900/95 to-black/95 backdrop-blur-xl text-white rounded-xl shadow-2xl p-6 max-w-xs w-full mx-4 border border-gray-700" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-4 border-b border-gray-700 pb-3">
                 <h3 className="text-lg font-bold">👥 Users ({users.length})</h3>
                 <button onClick={onClose} className="text-gray-400 hover:text-white">
@@ -166,7 +166,7 @@ const UserListPopup = ({ users, onClose }) => (
             </div>
             <ul className="space-y-2 max-h-60 overflow-y-auto">
                 {users.map((name, index) => (
-                    <li key={index} className="flex items-center space-x-3 p-2 hover:bg-gray-800 rounded-lg transition-colors">
+                    <li key={index} className="flex items-center space-x-3 p-2 hover:bg-gray-800/50 rounded-lg transition-colors">
                          <span className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
                          <span className="font-medium">{name}</span>
                      </li>
@@ -179,7 +179,7 @@ const UserListPopup = ({ users, onClose }) => (
 
 const SearchResultItem = ({ video, onPlayRequest }) => (
     <div
-        className="flex items-center p-3 space-x-3 hover:bg-gradient-to-r hover:from-gray-700 hover:to-gray-600 rounded-lg cursor-pointer transition-all duration-200 hover:scale-[1.02] border border-transparent hover:border-green-500"
+        className="flex items-center p-3 space-x-3 hover:bg-gradient-to-r hover:from-gray-700/50 hover:to-gray-600/50 rounded-lg cursor-pointer transition-all duration-200 hover:scale-[1.02] border border-transparent hover:border-green-500 backdrop-blur-sm"
         onClick={() => onPlayRequest(video.id.videoId, video.snippet.title)}
     >
         <img
@@ -196,10 +196,10 @@ const SearchResultItem = ({ video, onPlayRequest }) => (
 
 const TVChannelItem = ({ channel, onPlayRequest, isActive }) => (
     <div
-        className={`flex items-center p-3 space-x-3 rounded-lg cursor-pointer transition-all duration-200 border ${
+        className={`flex items-center p-3 space-x-3 rounded-lg cursor-pointer transition-all duration-200 border backdrop-blur-sm ${
             isActive 
-                ? 'bg-gradient-to-r from-green-600 to-green-500 border-green-400 shadow-lg shadow-green-500/50' 
-                : 'hover:bg-gray-700 hover:scale-[1.02] border-transparent hover:border-green-500'
+                ? 'bg-gradient-to-r from-green-600/80 to-green-500/80 border-green-400 shadow-lg shadow-green-500/50' 
+                : 'hover:bg-gray-700/50 hover:scale-[1.02] border-transparent hover:border-green-500'
         }`}
         onClick={() => onPlayRequest(channel)}
     >
@@ -213,10 +213,10 @@ const TVChannelItem = ({ channel, onPlayRequest, isActive }) => (
 
 const RadioStationItem = ({ station, onPlayRequest, isActive }) => (
     <div
-        className={`flex items-center p-3 space-x-3 rounded-lg cursor-pointer transition-all duration-200 border ${
+        className={`flex items-center p-3 space-x-3 rounded-lg cursor-pointer transition-all duration-200 border backdrop-blur-sm ${
             isActive 
-                ? 'bg-gradient-to-r from-blue-600 to-blue-500 border-blue-400 shadow-lg shadow-blue-500/50' 
-                : 'hover:bg-gray-700 hover:scale-[1.02] border-transparent hover:border-blue-500'
+                ? 'bg-gradient-to-r from-blue-600/80 to-blue-500/80 border-blue-400 shadow-lg shadow-blue-500/50' 
+                : 'hover:bg-gray-700/50 hover:scale-[1.02] border-transparent hover:border-blue-500'
         }`}
         onClick={() => onPlayRequest(station)}
     >
@@ -244,13 +244,13 @@ const getRandomColor = () => {
 const getMediaBackground = (mediaType) => {
     switch(mediaType) {
         case 'youtube':
-            return 'from-red-900 to-black';
+            return 'from-red-900/40 to-black';
         case 'tv':
-            return 'from-green-900 to-black';
+            return 'from-green-900/40 to-black';
         case 'radio':
-            return 'from-purple-900 to-black';
+            return 'from-purple-900/40 to-black';
         default:
-            return 'from-gray-900 to-black';
+            return 'from-gray-900/40 to-black';
     }
 };
 
@@ -284,7 +284,7 @@ export const Player = () => {
     const [chats, setChats] = useState([]);
     const [messageInput, setMessageInput] = useState("");
 
-    const [activeTab, setActiveTab] = useState('search');
+    const [activeTab, setActiveTab] = useState('chat');
     const [showUserList, setShowUserList] = useState(false);
     const [usersInRoom, setUsersInRoom] = useState([]);
     const [typingUsers, setTypingUsers] = useState([]);
@@ -305,7 +305,7 @@ export const Player = () => {
     const audioRef = useRef(null);
     const hlsRef = useRef(null);
     const mobileHlsRef = useRef(null);
-    const lastMessageRef = useRef(null);
+    const chatContainerRef = useRef(null);
     const isSeekingRef = useRef(false);
     const typingTimeoutRef = useRef(null);
     const activeTabRef = useRef(activeTab);
@@ -367,10 +367,10 @@ export const Player = () => {
                 { channelName: "SunTV HDR10", url: "https://livestream10.sunnxt.com/DolbyVision/SunTV_HDR/SunTV_HDR_Endpoints/SunTV-HDR10-IN-index.m3u8", category: "Entertainment" },
                 { channelName: "Kalaignar TV", url: "https://segment.yuppcdn.net/240122/kalaignartv/playlist.m3u8", category: "Entertainment" },
                 { channelName: "News Tamil 24x7", url: "https://d35j504z0x2vu2.cloudfront.net/v1/master/0bc8e8376bd8417a1b6761138aa41c26c7309312/news-tamil-24x7/index.m3u8", category: "News" },
-                { channelName: "Smil Isaiaruvit", url: "https://edge2-moblive.yuppcdn.net/drm1/smilisaiaruvi.smil/manifest.m3u8", category: "Music" },
-                { channelName: "Pishow TV 226", url: "https://cdn-2.pishow.tv/live/226/master.m3u8", category: "Entertainment" },
-                { channelName: "Pishow TV 1279", url: "https://cdn-3.pishow.tv/live/1279/master.m3u8", category: "Entertainment" },
-                { channelName: "Pishow TV 1241", url: "https://cdn-2.pishow.tv/live/1241/master.m3u8", category: "Entertainment" },
+                { channelName: "Isaiaruvi", url: "https://edge2-moblive.yuppcdn.net/drm1/smilisaiaruvi.smil/manifest.m3u8", category: "Music" },
+                { channelName: "Musix India", url: "https://cdn-2.pishow.tv/live/226/master.m3u8", category: "Entertainment" },
+                { channelName: "News J", url: "https://cdn-3.pishow.tv/live/1279/master.m3u8", category: "Entertainment" },
+                { channelName: "Polimer Tv", url: "https://cdn-2.pishow.tv/live/1241/master.m3u8", category: "Entertainment" },
                 { channelName: "Polimer News", url: "https://segment.yuppcdn.net/110322/polimernews/playlist.m3u8", category: "News" },
                 { channelName: "Puthiya Thalaimurai", url: "https://segment.yuppcdn.net/240122/puthiya/playlist.m3u8", category: "News" },
                 { channelName: "Siripoli", url: "https://segment.yuppcdn.net/240122/siripoli/playlist.m3u8", category: "Entertainment" },
@@ -567,6 +567,14 @@ export const Player = () => {
 
             return () => {
                 console.log('🧹 Cleaning up Player component');
+                
+                // ✅ Stop radio audio
+                if (audioRef.current) {
+                    audioRef.current.pause();
+                    audioRef.current.src = '';
+                    audioRef.current.load();
+                }
+                
                 if (socket) {
                     socket.off();
                     socket.disconnect();
@@ -588,13 +596,22 @@ export const Player = () => {
 
     }, [roomCode, navigate, notify, loadTVChannels, loadRadioStations, playNotificationSound]);
 
-    // ✅ PERFECT SYNC - Syncs BOTH players
+    // ✅ FIXED: Radio always stops before switching media
     const handleMediaChange = useCallback((media, playing, seekTime, startTime) => {
         if (!media) return;
 
         console.log("🎬 handleMediaChange:", media.type, media.title, "Playing:", playing);
 
-        // Destroy existing HLS instances
+        // ✅ ALWAYS STOP RADIO FIRST (regardless of previous media type)
+        const audio = audioRef.current;
+        if (audio) {
+            console.log("🛑 Stopping any existing radio audio");
+            audio.pause();
+            audio.src = '';
+            audio.load();
+        }
+
+        // Destroy HLS instances
         if (hlsRef.current) {
             hlsRef.current.destroy();
             hlsRef.current = null;
@@ -605,12 +622,18 @@ export const Player = () => {
         }
 
         if (media.type === 'youtube') {
-            // ✅ Sync function for YouTube players
-            const syncYouTubePlayer = (playerRefObj) => {
+            // Sync YouTube player with muting for mobile to prevent echo
+            const syncYouTubePlayer = (playerRefObj, shouldMute = false) => {
                 if (!playerRefObj?.current?.internalPlayer) return;
                 
                 try {
                     const player = playerRefObj.current.internalPlayer;
+                    
+                    if (shouldMute) {
+                        player.mute();
+                    } else {
+                        player.unMute();
+                    }
                     
                     if (playing && startTime) {
                         const currentTime = Date.now();
@@ -635,14 +658,12 @@ export const Player = () => {
                 }
             };
 
-            // Sync both players
-            syncYouTubePlayer(playerRef);
+            syncYouTubePlayer(playerRef, false);
             setTimeout(() => {
-                syncYouTubePlayer(mobilePlayerRef);
+                syncYouTubePlayer(mobilePlayerRef, true);
             }, 300);
 
         } else if (media.type === 'tv') {
-            // ✅ Setup TV for both desktop and mobile
             const setupTVPlayer = (videoElement, hlsRefObj) => {
                 if (!videoElement) return;
 
@@ -679,18 +700,14 @@ export const Player = () => {
             }, 300);
 
         } else if (media.type === 'radio') {
-            const audio = audioRef.current;
             if (!audio) {
                 console.error("❌ Audio ref is null!");
                 return;
             }
 
-            console.log("📻 Setting up radio:", media.url);
+            console.log("📻 Setting up NEW radio:", media.url);
             
-            audio.pause();
-            audio.src = '';
-            audio.load();
-            
+            // Already cleared above, now set new source
             audio.src = media.url;
             audio.load();
             
@@ -761,7 +778,6 @@ export const Player = () => {
         setSearchResults([]);
 
         try {
-            //let API_KEYS = ["AIzaSyD6qAtIRV4stj27ziUHN8LeKTYdBPrJzZ0", "AIzaSyDHjHJPKXM0tJFVCN1j0wH_cFGyprgcpwc"];
             let API_KEYS=["AIzaSyD6qAtIRV4stj27ziUHN8LeKTYdBPrJzZ0","AIzaSyDHjHJPKXM0tJFVCN1j0wH_cFGyprgcpwc","AIzaSyB-4iNzGs-5_qnJzasVJ2TYIvkI-GFLHRE","AIzaSyBQ2doMsFwD6TitN_VWIH7cEhtc_RkR-wo","AIzaSyD1IpLzlnCsLfo4sSMp-p9Okq7qzfPGOi8","AIzaSyCw-58Wv7HBwUSFeAKCMvylVG3EDdR3ZPQ","AIzaSyCbyQI2rLDhj_rO4p6j0l9QAtlkUwy9nuA","AIzaSyA0RfAKJPYipj75a6oIQ0tmFWs6i20tUDg","AIzaSyCamXR2_AWwutLAx16Wha2jcP7DnSdg1i4","AIzaSyBO944zaSSKHiNkiGNO5xOP5GoBDwK3f7I"];
             const apiKey = API_KEYS[Math.floor(Math.random() * API_KEYS.length)];
 
@@ -900,13 +916,11 @@ export const Player = () => {
 
                 if (playerState === 1) {
                     player.pauseVideo();
-                    // Also pause mobile player
                     if (mobilePlayerRef.current?.internalPlayer) {
                         mobilePlayerRef.current.internalPlayer.pauseVideo();
                     }
                 } else {
                     player.playVideo();
-                    // Also play mobile player
                     if (mobilePlayerRef.current?.internalPlayer) {
                         mobilePlayerRef.current.internalPlayer.playVideo();
                     }
@@ -920,14 +934,12 @@ export const Player = () => {
 
             if (video.paused) {
                 video.play().catch(err => console.error('Play error:', err));
-                // Sync mobile
                 if (mobileVideoRef.current) {
                     mobileVideoRef.current.play().catch(err => console.error('Mobile play error:', err));
                 }
                 socket?.emit('playbackAction', { isPlaying: true, currentTime: video.currentTime, currentMedia });
             } else {
                 video.pause();
-                // Sync mobile
                 if (mobileVideoRef.current) {
                     mobileVideoRef.current.pause();
                 }
@@ -992,9 +1004,10 @@ export const Player = () => {
         setMessageInput(prev => prev + emojiData.emoji);
     }, []);
 
+    // ✅ Auto-scroll to bottom on new messages
     useEffect(() => {
-        if (lastMessageRef.current) {
-            lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
         }
     }, [chats]);
 
@@ -1032,41 +1045,138 @@ export const Player = () => {
             
             <div className="flex flex-col h-screen bg-black text-white overflow-hidden">
                 {/* Header */}
-                <header className="flex items-center justify-between p-3 bg-gradient-to-r from-gray-900 to-gray-800 shadow-lg flex-shrink-0 border-b border-gray-700">
+                <header className="flex items-center justify-between p-3 bg-gradient-to-r from-gray-900/95 to-gray-800/95 backdrop-blur-xl shadow-lg flex-shrink-0 border-b border-gray-700 z-50">
                     <div className="flex items-center space-x-3">
                         <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                        <h1 className="text-lg font-bold text-green-400 truncate">Room: {roomCode}</h1>
+                        <h1 className="text-base md:text-lg font-bold text-green-400 truncate">Room: {roomCode}</h1>
                         <button onClick={copyRoomCode} title="Copy Room Code" className="text-gray-400 hover:text-green-400 transition-colors">
-                            <Copy size={18} />
+                            <Copy size={16} className="md:w-5 md:h-5" />
                         </button>
                     </div>
 
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-2 md:space-x-4">
+                        {(currentMedia?.type === 'youtube' || currentMedia?.type === 'tv') && (
+                            <button 
+                                onClick={handleToggleVideo} 
+                                title={videoEnabled ? "Turn Off Video (Audio Only)" : "Turn On Video"} 
+                                className={`p-2 md:p-2 rounded-full transition-all shadow-lg border ${
+                                    videoEnabled 
+                                        ? 'bg-gradient-to-r from-blue-600/90 to-blue-500/90 hover:from-blue-500/90 hover:to-blue-400/90 border-blue-400' 
+                                        : 'bg-gradient-to-r from-yellow-600/90 to-yellow-500/90 hover:from-yellow-500/90 hover:to-yellow-400/90 border-yellow-400'
+                                } text-white backdrop-blur-sm`}
+                            >
+                                {videoEnabled ? <Video size={18} className="md:w-5 md:h-5" /> : <VideoOff size={18} className="md:w-5 md:h-5" />}
+                            </button>
+                        )}
                         <button 
                             onClick={handleToggleNotifications} 
                             title={notificationsEnabled ? "Disable Notifications" : "Enable Notifications"}
                             className="text-gray-400 hover:text-white transition-colors"
                         >
-                            {notificationsEnabled ? <Bell size={20} /> : <BellOff size={20} />}
+                            {notificationsEnabled ? <Bell size={18} className="md:w-5 md:h-5" /> : <BellOff size={18} className="md:w-5 md:h-5" />}
                         </button>
-                        <span className="text-sm text-gray-300 hidden sm:block">👤 {userData?.name}</span>
+                        <span className="text-xs md:text-sm text-gray-300 hidden sm:block">👤 {userData?.name}</span>
                         <button onClick={() => setShowUserList(true)} title="Show Users" className="flex items-center space-x-1 text-gray-400 hover:text-white transition-colors">
-                            <Users size={20} />
-                            <span className="text-sm font-semibold">({usersInRoom.length})</span>
+                            <Users size={18} className="md:w-5 md:h-5" />
+                            <span className="text-xs md:text-sm font-semibold">({usersInRoom.length})</span>
                         </button>
-                        <button onClick={() => navigate('/')} title="Leave Room" className="px-3 py-1 bg-red-600 hover:bg-red-500 rounded-lg font-semibold text-sm transition-colors">
+                        <button onClick={() => navigate('/')} title="Leave Room" className="px-2 md:px-3 py-1 bg-red-600/90 hover:bg-red-500/90 backdrop-blur-sm rounded-lg font-semibold text-xs md:text-sm transition-colors">
                             Leave
                         </button>
                     </div>
                 </header>
 
+                {/* Mobile Video Player at Top */}
+                {currentMedia && (
+                    <div className="md:hidden relative bg-black/95 backdrop-blur-xl border-b border-gray-700 flex-shrink-0 z-40">
+                        <div className="p-2 flex items-center justify-center">
+                            <div className="w-full max-w-md aspect-video bg-black rounded-lg overflow-hidden relative flex items-center justify-center shadow-2xl border border-gray-700">
+                                {currentMedia.type === 'youtube' && currentMedia.videoId && videoEnabled && (
+                                    <div className="w-full h-full flex items-center justify-center bg-black">
+                                        <YouTube
+                                            ref={mobilePlayerRef}
+                                            videoId={currentMedia.videoId}
+                                            opts={{ 
+                                                width: '100%',
+                                                height: '100%',
+                                                playerVars: { 
+                                                    autoplay: 1,
+                                                    controls: 0, 
+                                                    modestbranding: 1,
+                                                    rel: 0,
+                                                    enablejsapi: 1,
+                                                    disablekb: 1,
+                                                    fs: 0,
+                                                    iv_load_policy: 3,
+                                                    mute: 1
+                                                } 
+                                            }}
+                                            onReady={onPlayerReady}
+                                            className="w-full h-full"
+                                            style={{ 
+                                                position: 'absolute',
+                                                top: 0,
+                                                left: 0,
+                                                width: '100%',
+                                                height: '100%'
+                                            }}
+                                        />
+                                    </div>
+                                )}
+                                {currentMedia.type === 'youtube' && currentMedia.videoId && !videoEnabled && (
+                                    <div className="w-full h-full bg-gradient-to-br from-red-900/90 via-black to-black backdrop-blur-sm flex flex-col items-center justify-center">
+                                        <div className="w-32 h-32 rounded-full bg-slate-400/10 backdrop-blur-3xl flex justify-center items-center mb-3 animate-pulse" style={{ boxShadow: `0 0 30px 2px ${borderColor}` }}>
+                                            <img src={loadingImage} alt="Audio Only" className="w-20 h-20" />
+                                        </div>
+                                        <p className="text-white text-sm font-bold">🎵 Audio Only</p>
+                                        <p className="text-gray-400 text-xs mt-1">Saving bandwidth</p>
+                                        <div className="hidden">
+                                            <YouTube
+                                                ref={mobilePlayerRef}
+                                                videoId={currentMedia.videoId}
+                                                opts={{ height: '0', width: '0', playerVars: { autoplay: 1, controls: 0, mute: 1 } }}
+                                                onReady={onPlayerReady}
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+                                {currentMedia.type === 'tv' && currentMedia.url && videoEnabled && (
+                                    <video
+                                        ref={mobileVideoRef}
+                                        className="w-full h-full object-contain"
+                                        controls={false}
+                                        autoPlay
+                                    />
+                                )}
+                                {currentMedia.type === 'tv' && currentMedia.url && !videoEnabled && (
+                                    <div className="w-full h-full bg-gradient-to-br from-green-900/90 via-black to-black backdrop-blur-sm flex flex-col items-center justify-center">
+                                        <div className="w-32 h-32 rounded-full bg-slate-400/10 backdrop-blur-3xl flex justify-center items-center mb-3" style={{ boxShadow: `0 0 25px 2px ${borderColor}` }}>
+                                            <img src={loadingImage} alt="TV Audio" className="w-20 h-20" />
+                                        </div>
+                                        <p className="text-gray-300 text-sm font-semibold">📺 Audio Only</p>
+                                        <p className="text-gray-500 text-xs mt-1">Saving bandwidth</p>
+                                    </div>
+                                )}
+                                {currentMedia.type === 'radio' && (
+                                    <div className="w-full h-full bg-gradient-to-br from-purple-900/90 via-blue-900/90 to-black backdrop-blur-sm flex flex-col items-center justify-center">
+                                        <div className="w-32 h-32 rounded-full bg-slate-400/10 backdrop-blur-3xl flex justify-center items-center mb-3 animate-pulse" style={{ boxShadow: `0 0 30px 2px ${borderColor}` }}>
+                                            <img src={loadingImage} alt="Radio" className="w-20 h-20" />
+                                        </div>
+                                        <p className="text-white text-sm font-bold truncate max-w-full px-4">{currentMedia.title}</p>
+                                        <p className="text-blue-400 text-xs flex items-center mt-1">
+                                            📻 Live Radio <span className="animate-ping ml-2 text-red-500">🔴</span>
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Mobile Tab Navigation */}
-                <div className="md:hidden flex justify-around items-center bg-gray-800 shadow-md overflow-x-auto">
-                    <button onClick={() => setActiveTab('player')} className={`flex-1 py-3 text-center font-semibold text-xs uppercase ${activeTab === 'player' ? 'text-green-400 border-b-2 border-green-400' : 'text-gray-400'}`}>
-                        Player
-                    </button>
+                <div className="md:hidden flex justify-around items-center bg-gray-800/95 backdrop-blur-xl shadow-md overflow-x-auto border-b border-gray-700 flex-shrink-0">
                     {['search', 'tv', 'radio', 'chat'].map(tab => (
-                        <button key={tab} onClick={() => setActiveTab(tab)} className={`flex-1 py-3 text-center font-semibold text-xs uppercase whitespace-nowrap ${activeTab === tab ? 'text-green-400 border-b-2 border-green-400' : 'text-gray-400'}`}>
+                        <button key={tab} onClick={() => setActiveTab(tab)} className={`flex-1 py-3 text-center font-semibold text-xs uppercase whitespace-nowrap transition-all ${activeTab === tab ? 'text-green-400 border-b-2 border-green-400 bg-gray-800/50' : 'text-gray-400'}`}>
                             {tab === 'tv' && <Tv size={14} className="inline mr-1" />}
                             {tab === 'radio' && <Radio size={14} className="inline mr-1" />}
                             {tab === 'search' && <Music size={14} className="inline mr-1" />}
@@ -1078,83 +1188,107 @@ export const Player = () => {
                 {/* Main Content */}
                 <div className="flex-grow flex flex-col md:flex-row overflow-hidden">
 
-                    {/* Player Column */}
-                    <div className={`${activeTab === 'player' ? 'flex' : 'hidden md:flex'} w-full md:w-2/3 flex-col p-4 space-y-4 bg-gradient-to-b ${getMediaBackground(currentMedia?.type)}`}>
-                        {/* Player Wrapper */}
-                        <div className="aspect-video bg-black rounded-xl overflow-hidden shadow-2xl relative border-2 border-gray-700 flex items-center justify-center">
-                            {currentMedia?.type === 'youtube' && currentMedia.videoId ? (
-                                videoEnabled ? (
-                                    <YouTube
-                                        ref={playerRef}
-                                        videoId={currentMedia.videoId}
-                                        opts={{ height: '100%', width: '100%', playerVars: { autoplay: 1, controls: 0, rel: 0, modestbranding: 1, enablejsapi: 1 } }}
-                                        onReady={onPlayerReady}
-                                        onStateChange={onPlayerStateChange}
-                                        onError={onPlayerError}
-                                        className="w-full h-full"
-                                    />
-                                ) : (
-                                    <div className="w-full h-full flex flex-col justify-center items-center bg-gradient-to-br from-red-900 to-black">
-                                        <div className="w-64 h-64 rounded-full bg-slate-400/10 backdrop-blur-3xl flex justify-center items-center mb-6 animate-pulse" style={{ boxShadow: `0 0 40px 3px ${borderColor}` }}>
-                                            <img src={loadingImage} alt="Audio Only" className="w-40 h-40" />
-                                        </div>
-                                        <p className="text-2xl font-bold text-white mb-2">🎵 Audio Only Mode</p>
-                                        <p className="text-gray-400 text-sm">Video disabled to save bandwidth</p>
-                                        <div className="mt-6 w-full flex justify-center">
-                                            <RandomBeatVisualizer data={borderColor} />
-                                        </div>
-                                        <div className="hidden">
+                    {/* Desktop Player Column - CENTERED */}
+                    <div className="hidden md:flex w-full md:w-2/3 flex-col p-4 space-y-4 bg-gradient-to-b from-gray-900/95 to-black backdrop-blur-sm relative overflow-hidden">
+                        <div className={`absolute inset-0 bg-gradient-to-br ${getMediaBackground(currentMedia?.type)} opacity-50 blur-3xl -z-10`}></div>
+                        
+                        <div className="w-full flex items-center justify-center">
+                            <div className="w-full max-w-5xl aspect-video bg-black rounded-xl overflow-hidden shadow-2xl relative border-2 border-gray-700/50 backdrop-blur-sm flex items-center justify-center">
+                                {currentMedia?.type === 'youtube' && currentMedia.videoId ? (
+                                    videoEnabled ? (
+                                        <div className="w-full h-full flex items-center justify-center bg-black">
                                             <YouTube
                                                 ref={playerRef}
                                                 videoId={currentMedia.videoId}
-                                                opts={{ height: '0', width: '0', playerVars: { autoplay: 1, controls: 0 } }}
+                                                opts={{ 
+                                                    width: '100%',
+                                                    height: '100%',
+                                                    playerVars: { 
+                                                        autoplay: 1, 
+                                                        controls: 0, 
+                                                        rel: 0, 
+                                                        modestbranding: 1, 
+                                                        enablejsapi: 1,
+                                                        disablekb: 1,
+                                                        fs: 0,
+                                                        iv_load_policy: 3
+                                                    } 
+                                                }}
                                                 onReady={onPlayerReady}
                                                 onStateChange={onPlayerStateChange}
                                                 onError={onPlayerError}
+                                                className="w-full h-full"
+                                                style={{ 
+                                                    position: 'absolute',
+                                                    top: 0,
+                                                    left: 0,
+                                                    width: '100%',
+                                                    height: '100%'
+                                                }}
                                             />
                                         </div>
-                                    </div>
-                                )
-                            ) : currentMedia?.type === 'tv' && currentMedia.url ? (
-                                <div className="relative w-full h-full">
-                                    <video ref={videoRef} className="w-full h-full object-contain" controls={false} autoPlay style={{ display: videoEnabled ? 'block' : 'none' }} />
-                                    {!videoEnabled && (
-                                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-green-900 to-black">
-                                            <div className="w-64 h-64 rounded-full bg-slate-400/10 backdrop-blur-3xl flex justify-center items-center mb-4" style={{ boxShadow: `0 0 30px 2px ${borderColor}` }}>
-                                                <img src={loadingImage} alt="TV Audio" className="w-32 h-32" />
+                                    ) : (
+                                        <div className="w-full h-full flex flex-col justify-center items-center bg-gradient-to-br from-red-900/90 via-black to-black backdrop-blur-sm">
+                                            <div className="w-64 h-64 rounded-full bg-slate-400/10 backdrop-blur-3xl flex justify-center items-center mb-6 animate-pulse" style={{ boxShadow: `0 0 40px 3px ${borderColor}` }}>
+                                                <img src={loadingImage} alt="Audio Only" className="w-40 h-40" />
                                             </div>
-                                            <p className="text-gray-300 text-lg font-semibold">📺 Audio Only Mode</p>
-                                            <p className="text-gray-500 text-sm mt-1">Saving bandwidth...</p>
-                                            <div className="mt-4">
+                                            <p className="text-2xl font-bold text-white mb-2">🎵 Audio Only Mode</p>
+                                            <p className="text-gray-400 text-sm">Video disabled to save bandwidth</p>
+                                            <div className="mt-6 w-full flex justify-center">
                                                 <RandomBeatVisualizer data={borderColor} />
                                             </div>
+                                            <div className="hidden">
+                                                <YouTube
+                                                    ref={playerRef}
+                                                    videoId={currentMedia.videoId}
+                                                    opts={{ height: '0', width: '0', playerVars: { autoplay: 1, controls: 0 } }}
+                                                    onReady={onPlayerReady}
+                                                    onStateChange={onPlayerStateChange}
+                                                    onError={onPlayerError}
+                                                />
+                                            </div>
                                         </div>
-                                    )}
-                                </div>
-                            ) : currentMedia?.type === 'radio' && currentMedia.url ? (
-                                <div className="w-full h-full flex flex-col justify-center items-center bg-gradient-to-br from-purple-900 via-blue-900 to-black">
-                                    <div className="w-64 h-64 rounded-full bg-slate-400/10 backdrop-blur-3xl flex justify-center items-center mb-6 animate-pulse" style={{ boxShadow: `0 0 40px 3px ${borderColor}` }}>
-                                        <img src={loadingImage} alt="Radio" className="w-40 h-40" />
+                                    )
+                                ) : currentMedia?.type === 'tv' && currentMedia.url ? (
+                                    <div className="relative w-full h-full">
+                                        <video ref={videoRef} className="w-full h-full object-contain" controls={false} autoPlay style={{ display: videoEnabled ? 'block' : 'none' }} />
+                                        {!videoEnabled && (
+                                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-green-900/90 via-black to-black backdrop-blur-sm">
+                                                <div className="w-64 h-64 rounded-full bg-slate-400/10 backdrop-blur-3xl flex justify-center items-center mb-4" style={{ boxShadow: `0 0 30px 2px ${borderColor}` }}>
+                                                    <img src={loadingImage} alt="TV Audio" className="w-32 h-32" />
+                                                </div>
+                                                <p className="text-gray-300 text-lg font-semibold">📺 Audio Only Mode</p>
+                                                <p className="text-gray-500 text-sm mt-1">Saving bandwidth...</p>
+                                                <div className="mt-4">
+                                                    <RandomBeatVisualizer data={borderColor} />
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
-                                    <p className="text-2xl font-bold text-white mb-2">{currentMedia.title}</p>
-                                    <p className="text-blue-400 flex items-center text-lg">
-                                        📻 Live Radio <span className="animate-ping ml-2 text-red-500">🔴</span>
-                                    </p>
-                                    <div className="mt-6 w-full flex justify-center">
-                                        <RandomBeatVisualizer data={borderColor} />
+                                ) : currentMedia?.type === 'radio' && currentMedia.url ? (
+                                    <div className="w-full h-full flex flex-col justify-center items-center bg-gradient-to-br from-purple-900/90 via-blue-900/90 to-black backdrop-blur-sm">
+                                        <div className="w-64 h-64 rounded-full bg-slate-400/10 backdrop-blur-3xl flex justify-center items-center mb-6 animate-pulse" style={{ boxShadow: `0 0 40px 3px ${borderColor}` }}>
+                                            <img src={loadingImage} alt="Radio" className="w-40 h-40" />
+                                        </div>
+                                        <p className="text-2xl font-bold text-white mb-2">{currentMedia.title}</p>
+                                        <p className="text-blue-400 flex items-center text-lg">
+                                            📻 Live Radio <span className="animate-ping ml-2 text-red-500">🔴</span>
+                                        </p>
+                                        <div className="mt-6 w-full flex justify-center">
+                                            <RandomBeatVisualizer data={borderColor} />
+                                        </div>
                                     </div>
-                                </div>
-                            ) : (
-                                <div className="w-full h-full flex flex-col justify-center items-center text-gray-500 bg-gradient-to-br from-gray-900 to-black">
-                                    <Music size={80} className="mb-4 text-gray-700" />
-                                    <p className="text-xl font-semibold">No media playing</p>
-                                    <p className="text-sm mt-2 text-gray-600">Search YouTube, TV, or Radio!</p>
-                                </div>
-                            )}
+                                ) : (
+                                    <div className="w-full h-full flex flex-col justify-center items-center text-gray-500 bg-gradient-to-br from-gray-900/90 to-black backdrop-blur-sm">
+                                        <Music size={80} className="mb-4 text-gray-700" />
+                                        <p className="text-xl font-semibold">No media playing</p>
+                                        <p className="text-sm mt-2 text-gray-600">Search YouTube, TV, or Radio!</p>
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
-                        {/* Controls */}
-                        <div className="flex flex-col items-center space-y-3 bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700">
+                        <div className="flex flex-col items-center space-y-3 bg-gray-800/70 backdrop-blur-xl rounded-xl p-4 border border-gray-700/50 shadow-xl">
                             <div className="text-center w-full px-2">
                                 <p className="text-lg font-bold truncate text-white">{currentMedia?.title || "No Media Selected"}</p>
                                 {currentMedia && (
@@ -1167,23 +1301,10 @@ export const Player = () => {
                             </div>
 
                             <div className="flex items-center justify-center space-x-6 w-full">
-                                {(currentMedia?.type === 'youtube' || currentMedia?.type === 'tv') && (
-                                    <button 
-                                        onClick={handleToggleVideo} 
-                                        title={videoEnabled ? "Turn Off Video (Audio Only)" : "Turn On Video"} 
-                                        className={`p-4 rounded-full transition-all shadow-xl border-2 ${
-                                            videoEnabled 
-                                                ? 'bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 border-blue-400' 
-                                                : 'bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 border-yellow-400'
-                                        } text-white`}
-                                    >
-                                        {videoEnabled ? <Video size={28} /> : <VideoOff size={28} />}
-                                    </button>
-                                )}
                                 <button 
                                     onClick={handleTogglePlayPause} 
                                     title={isPlaying ? "Pause" : "Play"} 
-                                    className={`p-4 rounded-full transition-all shadow-xl ${currentMedia ? 'bg-gradient-to-r from-green-500 to-green-400 hover:from-green-400 hover:to-green-300 text-white' : 'bg-gray-700 text-gray-500 cursor-not-allowed'}`} 
+                                    className={`p-4 rounded-full transition-all shadow-xl ${currentMedia ? 'bg-gradient-to-r from-green-500/90 to-green-400/90 hover:from-green-400/90 hover:to-green-300/90 text-white backdrop-blur-sm' : 'bg-gray-700 text-gray-500 cursor-not-allowed'}`} 
                                     disabled={!currentMedia}
                                 >
                                     {isPlaying ? <Pause size={32} fill="currentColor" /> : <Play size={32} fill="currentColor" />}
@@ -1193,11 +1314,20 @@ export const Player = () => {
                     </div>
 
                     {/* Tabs Column */}
-                    <div className={`${activeTab !== 'player' ? 'flex' : 'hidden md:flex'} w-full md:w-1/3 flex-col overflow-hidden border-l border-gray-800 bg-gradient-to-b ${getMediaBackground(currentMedia?.type)}`}>
-                        {/* Desktop Tab Nav */}
-                        <div className="hidden md:flex justify-around bg-gradient-to-r from-gray-900 to-gray-800 shadow-md">
+                    <div className="flex w-full md:w-1/3 flex-col overflow-hidden border-l border-gray-800/50 bg-gradient-to-b from-gray-900/95 to-black backdrop-blur-sm relative">
+                        <div className={`absolute inset-0 bg-gradient-to-br ${getMediaBackground(currentMedia?.type)} opacity-30 blur-3xl -z-10`}></div>
+                        
+                        <div className="hidden md:flex justify-around bg-gradient-to-r from-gray-900/95 to-gray-800/95 backdrop-blur-xl shadow-md border-b border-gray-700 z-30 flex-shrink-0">
                             {['search', 'tv', 'radio', 'chat'].map(tab => (
-                                <button key={tab} onClick={() => setActiveTab(tab)} className={`flex-1 py-4 text-center font-semibold text-sm uppercase transition-all ${activeTab === tab ? 'text-green-400 border-b-2 border-green-400 bg-gray-800' : 'text-gray-400 hover:text-white'}`}>
+                                <button 
+                                    key={tab} 
+                                    onClick={() => setActiveTab(tab)} 
+                                    className={`flex-1 py-4 text-center font-semibold text-sm uppercase transition-all ${
+                                        activeTab === tab 
+                                            ? 'text-green-400 border-b-2 border-green-400 bg-gray-800/50' 
+                                            : 'text-gray-400 hover:text-white'
+                                    }`}
+                                >
                                     {tab === 'tv' && <Tv size={16} className="inline mr-1" />}
                                     {tab === 'radio' && <Radio size={16} className="inline mr-1" />}
                                     {tab === 'search' && <Music size={16} className="inline mr-1" />}
@@ -1206,115 +1336,118 @@ export const Player = () => {
                             ))}
                         </div>
 
-                        {/* Tab Content */}
-                        <div className="flex-grow flex flex-col relative overflow-hidden">
-                            {/* Search Tab */}
+                        <div className="flex-grow flex flex-col relative overflow-hidden z-10">
                             {activeTab === 'search' && (
-                                <div className="flex flex-col h-full bg-black/60 backdrop-blur-lg">
-                                    <form onSubmit={handleSearch} className="p-3 flex items-center space-x-2 sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-gray-800">
-                                        <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search YouTube..." className="flex-grow p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 placeholder-gray-500" />
-                                        <button type="submit" disabled={searchLoading || !searchQuery} className="px-4 py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 rounded-lg disabled:opacity-50 text-sm font-semibold shadow-lg">
+                                <div className="flex flex-col h-full bg-black/70 backdrop-blur-xl overflow-hidden">
+                                    <form onSubmit={handleSearch} className="p-3 flex items-center space-x-2 bg-black/90 backdrop-blur-xl z-20 border-b border-gray-800 flex-shrink-0">
+                                        <input 
+                                            type="text" 
+                                            value={searchQuery} 
+                                            onChange={(e) => setSearchQuery(e.target.value)} 
+                                            placeholder="Search YouTube..." 
+                                            className="flex-grow p-3 bg-gray-800/90 backdrop-blur-sm text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 placeholder-gray-500 border border-gray-700" 
+                                        />
+                                        <button 
+                                            type="submit" 
+                                            disabled={searchLoading || !searchQuery} 
+                                            className="px-4 py-3 bg-gradient-to-r from-green-600/90 to-green-500/90 hover:from-green-500/90 hover:to-green-400/90 backdrop-blur-sm rounded-lg disabled:opacity-50 text-sm font-semibold shadow-lg flex-shrink-0"
+                                        >
                                             {searchLoading ? "..." : "Search"}
                                         </button>
                                     </form>
-                                    {errorMessage && !searchLoading && <p className="text-red-500 p-3 text-center text-sm">{errorMessage}</p>}
-                                    {searchLoading && <div className="flex justify-center items-center p-4"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div></div>}
-                                    <div className="flex-grow overflow-y-auto p-2 space-y-2">
-                                        {!searchLoading && searchResults.length === 0 && !errorMessage && <p className="text-gray-500 text-center pt-10">🔍 Search for videos (Max 2 results)</p>}
-                                        {searchResults.map(video => <SearchResultItem key={video.id.videoId} video={video} onPlayRequest={handlePlayRequest} />)}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* TV Tab */}
-                            {activeTab === 'tv' && (
-                                <div className="flex flex-col h-full bg-black/60 backdrop-blur-lg">
-                                    <div className="p-3 sticky top-0 bg-black/80 backdrop-blur-md z-10 border-b border-gray-800">
-                                        <h3 className="text-lg font-bold flex items-center"><Tv size={20} className="mr-2 text-green-400 flex-shrink-0" /> TV Channels</h3>
-                                    </div>
-                                    {tvLoading && <div className="flex justify-center items-center p-4"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div></div>}
-                                    <div className="flex-grow overflow-y-auto p-2 space-y-2">
-                                        {!tvLoading && tvChannels.length === 0 && <p className="text-gray-500 text-center pt-10">📺 No channels</p>}
-                                        {tvChannels.map((channel, idx) => <TVChannelItem key={idx} channel={channel} onPlayRequest={handlePlayTV} isActive={currentMedia?.type === 'tv' && currentMedia?.url === channel.url} />)}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Radio Tab */}
-                            {activeTab === 'radio' && (
-                                <div className="flex flex-col h-full bg-black/60 backdrop-blur-lg overflow-hidden">
-                                    <div className="p-3 flex-shrink-0 bg-black/80 backdrop-blur-md border-b border-gray-800">
-                                        <h3 className="text-lg font-bold flex items-center"><Radio size={20} className="mr-2 text-blue-400 flex-shrink-0" /> Radio Stations</h3>
-                                    </div>
-                                    {radioLoading && <div className="flex justify-center items-center p-4"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div></div>}
-                                    <div className="flex-1 overflow-y-auto p-2 space-y-2">
-                                        {!radioLoading && radioStations.length === 0 && <p className="text-gray-500 text-center pt-10">📻 No stations</p>}
-                                        {radioStations.map((station, idx) => <RadioStationItem key={idx} station={station} onPlayRequest={handlePlayRadio} isActive={currentMedia?.type === 'radio' && currentMedia?.url === station.src} />)}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* ✅ Chat Tab - PERFECT SYNC */}
-                            {activeTab === 'chat' && (
-                                <div className="flex flex-col h-full relative overflow-hidden">
-                                    <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/85 to-black/95 backdrop-blur-xl z-10"></div>
-
-                                    {/* ✅ Mobile Video Preview - PERFECTLY SYNCED */}
-                                    {currentMedia && videoEnabled && (
-                                        <div className="md:hidden relative z-20 bg-black/90 backdrop-blur-lg border-b border-gray-700 flex-shrink-0">
-                                            <div className="p-2">
-                                                <div className="aspect-video bg-black rounded-lg overflow-hidden relative max-h-40 flex items-center justify-center">
-                                                    {currentMedia.type === 'youtube' && currentMedia.videoId && (
-                                                        <YouTube
-                                                            ref={mobilePlayerRef}
-                                                            videoId={currentMedia.videoId}
-                                                            opts={{ 
-                                                                height: '160', 
-                                                                width: '100%', 
-                                                                playerVars: { 
-                                                                    autoplay: 1,
-                                                                    controls: 1, 
-                                                                    modestbranding: 1,
-                                                                    rel: 0,
-                                                                    enablejsapi: 1
-                                                                } 
-                                                            }}
-                                                            onReady={onPlayerReady}
-                                                            className="w-full h-full"
-                                                        />
-                                                    )}
-                                                    {currentMedia.type === 'tv' && currentMedia.url && (
-                                                        <video
-                                                            ref={mobileVideoRef}
-                                                            className="w-full h-full object-contain"
-                                                            controls
-                                                            autoPlay
-                                                        />
-                                                    )}
-                                                    {currentMedia.type === 'radio' && (
-                                                        <div className="w-full h-full bg-gradient-to-br from-purple-900 to-black flex flex-col items-center justify-center">
-                                                            <Radio size={32} className="text-blue-400 mb-2" />
-                                                            <p className="text-white text-sm font-semibold truncate max-w-full px-2">{currentMedia.title}</p>
-                                                            <p className="text-blue-400 text-xs">📻 Live Radio</p>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
+                                    {errorMessage && !searchLoading && (
+                                        <p className="text-red-500 p-3 text-center text-sm">{errorMessage}</p>
+                                    )}
+                                    {searchLoading && (
+                                        <div className="flex justify-center items-center p-4">
+                                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
                                         </div>
                                     )}
+                                    <div className="flex-grow overflow-y-auto p-2 space-y-2">
+                                        {!searchLoading && searchResults.length === 0 && !errorMessage && (
+                                            <p className="text-gray-500 text-center pt-10">🔍 Search for videos (Max 2 results)</p>
+                                        )}
+                                        {searchResults.map(video => (
+                                            <SearchResultItem 
+                                                key={video.id.videoId} 
+                                                video={video} 
+                                                onPlayRequest={handlePlayRequest} 
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
 
-                                    {/* Chat Messages Area */}
-                                    <div className="flex-1 overflow-y-auto p-3 space-y-3 relative z-20">
+                            {activeTab === 'tv' && (
+                                <div className="flex flex-col h-full bg-black/70 backdrop-blur-xl overflow-hidden">
+                                    <div className="p-3 bg-black/90 backdrop-blur-xl z-20 border-b border-gray-800 flex-shrink-0">
+                                        <h3 className="text-lg font-bold flex items-center">
+                                            <Tv size={20} className="mr-2 text-green-400 flex-shrink-0" /> TV Channels
+                                        </h3>
+                                    </div>
+                                    {tvLoading && (
+                                        <div className="flex justify-center items-center p-4">
+                                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+                                        </div>
+                                    )}
+                                    <div className="flex-grow overflow-y-auto p-2 space-y-2">
+                                        {!tvLoading && tvChannels.length === 0 && (
+                                            <p className="text-gray-500 text-center pt-10">📺 No channels</p>
+                                        )}
+                                        {tvChannels.map((channel, idx) => (
+                                            <TVChannelItem 
+                                                key={idx} 
+                                                channel={channel} 
+                                                onPlayRequest={handlePlayTV} 
+                                                isActive={currentMedia?.type === 'tv' && currentMedia?.url === channel.url} 
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'radio' && (
+                                <div className="flex flex-col h-full bg-black/70 backdrop-blur-xl overflow-hidden">
+                                    <div className="p-3 bg-black/90 backdrop-blur-xl z-20 border-b border-gray-800 flex-shrink-0">
+                                        <h3 className="text-lg font-bold flex items-center">
+                                            <Radio size={20} className="mr-2 text-blue-400 flex-shrink-0" /> Radio Stations
+                                        </h3>
+                                    </div>
+                                    {radioLoading && (
+                                        <div className="flex justify-center items-center p-4">
+                                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                                        </div>
+                                    )}
+                                    <div className="flex-grow overflow-y-auto p-2 space-y-2">
+                                        {!radioLoading && radioStations.length === 0 && (
+                                            <p className="text-gray-500 text-center pt-10">📻 No stations</p>
+                                        )}
+                                        {radioStations.map((station, idx) => (
+                                            <RadioStationItem 
+                                                key={idx} 
+                                                station={station} 
+                                                onPlayRequest={handlePlayRadio} 
+                                                isActive={currentMedia?.type === 'radio' && currentMedia?.url === station.src} 
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'chat' && (
+                                <div className="flex flex-col h-full relative overflow-hidden">
+                                    <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/90 to-black/95 backdrop-blur-2xl z-10"></div>
+
+                                    <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-3 space-y-3 relative z-20">
                                         {chats.map((item, index) => {
                                             const key = item.id || `msg-${index}`;
                                             
-                                            // Handle GIF messages
                                             if (item.text?.startsWith('[GIF]')) {
                                                 const gifUrl = item.text.replace('[GIF]', '');
                                                 if (item.user?.toLowerCase() === userData?.name?.toLowerCase()) {
                                                     return (
                                                         <div key={key} className="flex justify-end">
-                                                            <div className="bg-green-600 rounded-lg p-2 max-w-xs">
+                                                            <div className="bg-green-600/90 backdrop-blur-sm rounded-lg p-2 max-w-xs">
                                                                 <img src={gifUrl} alt="GIF" className="rounded-lg max-w-full" />
                                                                 <p className="text-xs text-green-200 mt-1">{getFormattedTime()}</p>
                                                             </div>
@@ -1323,7 +1456,7 @@ export const Player = () => {
                                                 } else {
                                                     return (
                                                         <div key={key} className="flex justify-start">
-                                                            <div className="bg-gray-700 rounded-lg p-2 max-w-xs">
+                                                            <div className="bg-gray-700/90 backdrop-blur-sm rounded-lg p-2 max-w-xs">
                                                                 <p className="text-xs text-gray-400 mb-1">{item.user}</p>
                                                                 <img src={gifUrl} alt="GIF" className="rounded-lg max-w-full" />
                                                                 <p className="text-xs text-gray-400 mt-1">{getFormattedTime()}</p>
@@ -1333,7 +1466,6 @@ export const Player = () => {
                                                 }
                                             }
                                             
-                                            // Regular text messages
                                             if (item.user?.toLowerCase() === 'admin') {
                                                 return <AdminText key={key} id={item.id} text={item.text} />;
                                             } else if (item.user?.toLowerCase() === userData?.name?.toLowerCase()) {
@@ -1342,15 +1474,16 @@ export const Player = () => {
                                                 return <HerText key={key} id={item.id} text={item.text} name={item.user} time={getFormattedTime()} />;
                                             }
                                         })}
-                                        <div ref={lastMessageRef} />
                                     </div>
 
-                                    {/* Typing Indicator */}
-                                    <div className="h-6 px-3 bg-black/70 backdrop-blur-md text-xs text-blue-400 italic flex items-center border-t border-gray-800/50 relative z-20 flex-shrink-0">
-                                        {typingUsers.length > 0 && <span className="animate-pulse">✍️ {typingUsers.join(', ')} {typingUsers.length === 1 ? 'is' : 'are'} typing...</span>}
+                                    <div className="h-6 px-3 bg-black/80 backdrop-blur-xl text-xs text-blue-400 italic flex items-center border-t border-gray-800/50 relative z-20 flex-shrink-0">
+                                        {typingUsers.length > 0 && (
+                                            <span className="animate-pulse">
+                                                ✍️ {typingUsers.join(', ')} {typingUsers.length === 1 ? 'is' : 'are'} typing...
+                                            </span>
+                                        )}
                                     </div>
 
-                                    {/* Chat Input Bar */}
                                     <div className="relative z-30">
                                         {showEmojiPicker && (
                                             <div className="absolute bottom-16 left-0 z-50">
@@ -1364,7 +1497,7 @@ export const Player = () => {
 
                                         <form 
                                             onSubmit={handleSendMessage} 
-                                            className="p-3 flex items-center space-x-2 bg-black/90 backdrop-blur-xl border-t border-gray-700/50 flex-shrink-0"
+                                            className="p-3 flex items-center space-x-2 bg-black/95 backdrop-blur-2xl border-t border-gray-700/50 flex-shrink-0"
                                         >
                                             <button
                                                 type="button"
@@ -1372,10 +1505,10 @@ export const Player = () => {
                                                     setShowEmojiPicker(!showEmojiPicker);
                                                     setShowGifPicker(false);
                                                 }}
-                                                className="p-2 text-gray-400 hover:text-yellow-400 transition-colors"
+                                                className="p-2 text-gray-400 hover:text-yellow-400 transition-colors flex-shrink-0"
                                                 title="Add Emoji"
                                             >
-                                                <Smile size={24} />
+                                                <Smile size={22} className="md:w-6 md:h-6" />
                                             </button>
                                             
                                             <button
@@ -1384,10 +1517,10 @@ export const Player = () => {
                                                     setShowGifPicker(!showGifPicker);
                                                     setShowEmojiPicker(false);
                                                 }}
-                                                className="p-2 text-gray-400 hover:text-blue-400 transition-colors"
+                                                className="p-2 text-gray-400 hover:text-blue-400 transition-colors flex-shrink-0"
                                                 title="Send GIF"
                                             >
-                                                <ImageIcon size={24} />
+                                                <ImageIcon size={22} className="md:w-6 md:h-6" />
                                             </button>
                                             
                                             <input 
@@ -1395,15 +1528,15 @@ export const Player = () => {
                                                 value={messageInput} 
                                                 onChange={handleTyping} 
                                                 placeholder="Type a message..." 
-                                                className="flex-1 p-3 bg-gray-800/90 backdrop-blur-sm text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 placeholder-gray-400 border border-gray-600" 
+                                                className="flex-1 p-2 md:p-3 bg-gray-800/95 backdrop-blur-xl text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 placeholder-gray-400 border border-gray-600 text-sm md:text-base" 
                                                 maxLength={200} 
                                             />
                                             <button 
                                                 type="submit" 
                                                 disabled={!messageInput || !isConnected} 
-                                                className="p-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 rounded-lg disabled:opacity-50 shadow-lg transition-all flex-shrink-0"
+                                                className="p-2 md:p-3 bg-gradient-to-r from-green-600/90 to-green-500/90 hover:from-green-500/90 hover:to-green-400/90 backdrop-blur-sm rounded-lg disabled:opacity-50 shadow-lg transition-all flex-shrink-0"
                                             >
-                                                <SendHorizontal size={20} />
+                                                <SendHorizontal size={18} className="md:w-5 md:h-5" />
                                             </button>
                                         </form>
                                     </div>
